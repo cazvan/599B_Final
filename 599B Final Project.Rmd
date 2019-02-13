@@ -27,7 +27,7 @@ year=table(brfssdata$year)
 yearord=sort(year)
 barplot(yearord,col=color,main=title2,sub=source2,ylab='Number of Interviews',xlab="Year",)
 
-yeargg=as.data.frame(yearord)
+yeargg=as.data.frame(year)
 names(yeargg)=c("Year","Frequency")
 yeargg
 yearplot=ggplot(data= yeargg, aes(x=Year, y=Frequency))

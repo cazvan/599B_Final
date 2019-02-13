@@ -1,0 +1,45 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+Caz VanDevere, Ana Chkheidze, and Hanson Shi
+Final Visual Analytics Project
+599B Data Visualization
+March 15, 2019
+
+```{r libraries eval=TRUE}
+#call libraries:
+library(haven)
+library(ggplot2)
+```
+
+```{r retrievedata eval=TRUE}
+datalink='https://dl.dropboxusercontent.com/s/xhs2utpj1wntmzt/BRFSSFinalSup.dta'
+brfssdata=read_dta(datalink)
+```
+
+```{r univariate}
+# barplot
+title2="Interview Year"
+source2="BRFSS Survey Data 2000-2018"
+color=rainbow(length(ToPlot)) # customizing set of colors
+year=table(brfssdata$year)
+yearord=sort(year)
+barplot(yearord,col=color,main=title2,sub=source2,ylab='Number of Interviews',xlab="Year",)
+
+yeargg=as.data.frame(year)
+names(yeargg)=c("Year","Frequency")
+yearplot=ggplot(data= yeargg, aes(x=Year, y=Frequency))
+yearplot2=yearplot + labs(title=title2, x=NULL, y=NULL,caption=source2)
+yearplot3 = yearplot2 + geom_hline(yintercept = 200000, #where
+                           linetype="dashed", 
+                           size=1.5, #thickness
+                           alpha=0.5) #transparency
+yearplot4 = yearplot3 + theme(panel.background = element_rect(fill = "white",
+                                                    colour = "grey50"),
+                    plot.caption = element_text(hjust = 0), # default was 1
+                    plot.title = element_text(hjust = 0.5))
+plotyear = yearplot4 + geom_bar(fill ="grey",
+                        stat = 'identity')
+plotyear
+```

@@ -1,12 +1,8 @@
 ---
-title: "R Notebook"
+title: "Homework 1-Univar"
 output: html_notebook
 ---
-
-This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
-
-Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Cmd+Shift+Enter*. 
-
+ 
 ```{r libraries, eval=TRUE}
 library(ggplot2)
 library(haven)
@@ -53,8 +49,8 @@ plot2=plot1 + geom_bar(fill ="grey",
                         size = 3) +
               coord_flip()
   
-plot3=plot2 + scale_y_continuous(breaks=seq(0,17, by=5),
-                                 limits = c(0, 17), 
+plot3=plot2 + scale_y_continuous(breaks=seq(0,18, by=3),
+                                 limits = c(0, 18), 
                                  labels=scales::unit_format(suffix = '%'))     
 plot4 = plot3 + labs(title=ttl,
                      x="Days", 
@@ -70,27 +66,4 @@ plot5
 
 
 
-```{r}
-titleg="bla"
-captiong="BRFSS Survey Data 2000-2018"
-boxprep= levels(mentalT$Frequency)
-box1 = ggplot(mentalT, aes(y=Frequency)) + geom_boxplot()+coord_flip()
-box1 +scale_y_continuous()+labs(title=titleg,y='Mental Health Report', x=NULL, caption=captiong)
-
-```
-
-```{r}
-pos_q1=     ggplot_build(box2)$data[[1]]$lower
-pos_median= ggplot_build(box2)$data[[1]]$middle
-pos_q3=     ggplot_build(box2)$data[[1]]$upper
-
-# using
-levels(eduwa$High.Grade)[c(pos_q1,pos_median,pos_q3)]
-```
-
-Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Cmd+Option+I*.
-
-When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Cmd+Shift+K* to preview the HTML file). 
-
-The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
 

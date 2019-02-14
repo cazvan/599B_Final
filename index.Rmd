@@ -14,11 +14,11 @@ datalink='https://dl.dropboxusercontent.com/s/xhs2utpj1wntmzt/BRFSSFinalSup.dta'
 brfssdata=read_dta(datalink)
 ```
 
-```{r}
+```{r removena, eval=TRUE}
 brfssdata2=brfssdata[complete.cases(brfssdata), ]
 ```
 
-```{r}
+```{r barplotprep,eval=TRUE}
 mentalT=table(brfssdata2$mental,exclude=0)
 
 MentalT2=prop.table(mentalT)

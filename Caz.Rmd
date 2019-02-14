@@ -18,6 +18,14 @@ datalink='https://dl.dropboxusercontent.com/s/xhs2utpj1wntmzt/BRFSSFinalSup.dta'
 brfssdata=read_dta(datalink)
 ```
 
+```{r}
+datalong='policywide.dta'
+datawide='policywide.dta'
+datal=read_dta(datalong)
+dataw=read_dta(datawide)
+```
+
+
 ```{r univariatebarplotprep}
 # barplot
 title1="Interview Year"
@@ -47,10 +55,11 @@ plotyear
 ```
 
 ```{r}
-title2="Days in the Past Month of Reported Negative Mental Health"
-mentaldays=table(brfssdata$mental,exclude = 0)
-mentaldays0=table(brfssdata$mental)
-mental=as.data.frame(mentaldays)
+title2="Number Days in the Past Month of Reported Negative Mental Health"
+brfss=brfssdata[complete.cases(brfssdata$mental),]
+mentaldays=table(brfss$mental,exclude = 0)
+mentaldays0=table(brfss$mental)
+mental=as.data.frame(mentaldays0)
 barplot(mentaldays)
 barplot(mentaldays0)
 ```
@@ -63,3 +72,37 @@ mentalplot2 = mentalplot + geom_bar(fill ="grey",
 mentalplot3 = mentalplot2 + labs(title=title2, x=NULL, y=NULL,caption=source1)
 mentalplot3
 ```
+
+```{r}
+tapply(brfss$mental,brfss$stab,mean)
+means=tapply(brfssdata$mental,brfssdata$stab,mean,na.rm=T)
+```
+
+```{r}
+boxplot(as.numeric(mentaldays), horizontal = T)
+boxplot(as.numeric(mentaldays0), horizontal = T,ylim=c(5,220000))
+
+ggdat=as.data.frame(brfss)
+mentbox = ggplot(ggdat, aes(y=as.numeric(mental))) 
+mentbox1 = mentbox + geom_boxplot() + coord_flip()
+```
+
+```{r}
+mex00=tapply(brfssdata$mental,brfssdata$year,mean,na.rm=T)
+mex00
+
+mex18=tapply(brfssdata$mental,brfssdata$ex2018,mean,na.rm=T)
+mex18
+```
+
+```{r}
+mentprop=prop.table(mentaldays)
+propframe=as.data.frame(mentprop)
+names(propframe)=c('Days','Percent')
+propframe
+
+base = ggplot(propframe,aes(x=Days,y=Percent))
+base + geom_bar(stat = 'identity') 
+```
+
+

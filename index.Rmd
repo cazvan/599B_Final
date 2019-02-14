@@ -1,0 +1,69 @@
+---
+title: "Homework 1-Univar"
+output: html_notebook
+---
+ 
+```{r libraries, eval=TRUE}
+library(ggplot2)
+library(haven)
+```
+
+
+```{r loaddata, eval=TRUE}
+datalink='https://dl.dropboxusercontent.com/s/xhs2utpj1wntmzt/BRFSSFinalSup.dta'
+brfssdata=read_dta(datalink)
+```
+
+```{r}
+brfssdata2=brfssdata[complete.cases(brfssdata), ]
+```
+
+```{r}
+mentalT=table(brfssdata2$mental,exclude=0)
+
+MentalT2=prop.table(mentalT)
+MentalT2=MentalT2*100
+
+
+MentalTdf=as.data.frame(MentalT2)
+names(MentalTdf)=c("mentd","Frequency")
+MentalTdf
+
+
+
+```
+
+
+```{r univar, eval=TRUE}
+source="BRFSS Survey Data 2000-2018"
+ttl="Proportion of Negative Mental Health Cases Reported (in Days)"
+
+plot1=ggplot(data=MentalTdf, aes(x=mentd, y=Frequency))
+plot2=plot1 + geom_bar(fill ="grey", 
+                       col="black",
+                       lwd=0.3,
+                       stat = 'identity')+ 
+              geom_text(aes(y =Frequency, 
+                            label = paste0(round(Frequency,2), '%')),
+                        hjust=-0.09, 
+                        size = 3) +
+              coord_flip()
+  
+plot3=plot2 + scale_y_continuous(breaks=seq(0,18, by=3),
+                                 limits = c(0, 18), 
+                                 labels=scales::unit_format(suffix = '%'))     
+plot4 = plot3 + labs(title=ttl,
+                     x="Days", 
+                     y="Percent",
+                     caption=source)
+
+plot5 = plot4 + theme(panel.background = element_rect(fill = "white",colour = "grey20"),
+                      plot.caption = element_text(hjust = 0), 
+                      plot.title = element_text(hjust = 0.5),
+                      axis.text.y= element_text(size=8))
+plot5
+```
+
+
+
+

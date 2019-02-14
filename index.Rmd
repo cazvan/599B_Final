@@ -1,6 +1,8 @@
 ---
 title: "Homework 1-Univar"
-output: html_notebook
+output:
+  html_document:
+    df_print: paged
 ---
  
 ```{r libraries, eval=TRUE}

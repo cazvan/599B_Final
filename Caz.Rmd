@@ -1,0 +1,65 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+Caz VanDevere, Ana Chkheidze, and Hanson Shi
+Final Visual Analytics Project
+599B Data Visualization
+March 15, 2019
+
+```{r libraries eval=TRUE}
+#call libraries:
+library(haven)
+library(ggplot2)
+```
+
+```{r retrievedata eval=TRUE}
+datalink='https://dl.dropboxusercontent.com/s/xhs2utpj1wntmzt/BRFSSFinalSup.dta'
+brfssdata=read_dta(datalink)
+```
+
+```{r univariatebarplotprep}
+# barplot
+title1="Interview Year"
+source1="BRFSS Survey Data 2000-2018"
+year=table(brfssdata$year)
+color=rainbow(length(year)) # customizing set of colors
+yearord=sort(year)
+# barplot(yearord,col=color,main=title1,sub=source1,ylab='Number of Interviews',xlab="Year",)
+```
+
+```{r univariatebarplotprep}
+yeargg=as.data.frame(year)
+names(yeargg)=c("Year","Frequency")
+yearplot=ggplot(data= yeargg, aes(x=Year, y=Frequency))
+yearplot2=yearplot + labs(title=title1, x=NULL, y=NULL,caption=source1)
+yearplot3 = yearplot2 + geom_hline(yintercept = 200000, #where
+                           linetype="dashed", 
+                           size=1.5, #thickness
+                           alpha=0.5) #transparency
+yearplot4 = yearplot3 + theme(panel.background = element_rect(fill = "white",
+                                                    colour = "grey50"),
+                    plot.caption = element_text(hjust = 0), # default was 1
+                    plot.title = element_text(hjust = 0.5))
+plotyear = yearplot4 + geom_bar(fill ="grey",
+                        stat = 'identity')
+plotyear
+```
+
+```{r}
+title2="Days in the Past Month of Reported Negative Mental Health"
+mentaldays=table(brfssdata$mental,exclude = 0)
+mentaldays0=table(brfssdata$mental)
+mental=as.data.frame(mentaldays)
+barplot(mentaldays)
+barplot(mentaldays0)
+```
+
+```{r}
+names(mental)=c("Days","Frequency")
+mentalplot=ggplot(data= mental, aes(x=Days, y=Frequency))
+mentalplot2 = mentalplot + geom_bar(fill ="grey",
+                        stat = 'identity')
+mentalplot3 = mentalplot2 + labs(title=title2, x=NULL, y=NULL,caption=source1)
+mentalplot3
+```

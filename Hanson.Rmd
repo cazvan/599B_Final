@@ -1,46 +1,98 @@
 ---
-title: "R Notebook"
-output: html_notebook
+title: 
+output:
+  html_document:
+    df_print: paged
 ---
-Caz VanDevere, Ana Chkheidze, and Hanson Shi
-Final Visual Analytics Project
-599B Data Visualization
-March 15, 2019
-
-```{r libraries eval=TRUE}
-#call libraries:
-library(haven)
+ 
+```{r libraries, eval=TRUE}
+# call libraries:
 library(ggplot2)
+library(haven)
 ```
 
-```{r retrievedata eval=TRUE}
+```{r loaddata, eval=TRUE}
+# import data (~800mb):
 datalink='https://dl.dropboxusercontent.com/s/xhs2utpj1wntmzt/BRFSSFinalSup.dta'
 brfssdata=read_dta(datalink)
 ```
 
-```{r univariate}
-# barplot
-title2="Interview Year"
-source2="BRFSS Survey Data 2000-2018"
-color=rainbow(length(ToPlot)) # customizing set of colors
-year=table(brfssdata$year)
-yearord=sort(year)
-barplot(yearord,col=color,main=title2,sub=source2,ylab='Number of Interviews',xlab="Year",)
-
-yeargg=as.data.frame(yearord)
-names(yeargg)=c("Year","Frequency")
-yeargg
-yearplot=ggplot(data= yeargg, aes(x=Year, y=Frequency))
-yearplot2=yearplot + labs(title=title2, x=NULL, y=NULL,caption=source2)
-yearplot3 = yearplot2 + geom_hline(yintercept = 200000, #where
-                           linetype="dashed", 
-                           size=1.5, #thickness
-                           alpha=0.5) #transparency
-yearplot4 = yearplot3 + theme(panel.background = element_rect(fill = "white",
-                                                    colour = "grey50"),
-                    plot.caption = element_text(hjust = 0), # default was 1
-                    plot.title = element_text(hjust = 0.5))
-plotyear = yearplot4 + geom_bar(fill ="grey",
-                        stat = 'identity')
-plotyear
+```{r removena, eval=TRUE}
+brfssdata2=brfssdata[complete.cases(brfssdata), ]
 ```
+
+```{r barplotprep,eval=TRUE}
+mentalT=table(brfssdata2$mental,exclude=0)
+
+MentalT2=prop.table(mentalT)
+MentalT2=MentalT2*100
+
+MentalTdf=as.data.frame(MentalT2)
+names(MentalTdf)=c("mentd","Frequency")
+MentalTdf
+```
+
+
+```{r univar, eval=TRUE}
+### Univariate graph
+source="BRFSS Survey Data 2000-2018"
+ttl="Proportion of Negative Mental Health Cases Reported (in Days)"
+
+plot1=ggplot(data=MentalTdf, aes(x=mentd, y=Frequency))
+plot2=plot1 + geom_bar(fill ="grey", 
+                       col="black",
+                       lwd=0.3,
+                       stat = 'identity')+ 
+              geom_text(aes(y =Frequency, 
+                            label = paste0(round(Frequency,2), '%')),
+                        hjust=-0.09, 
+                        size = 3) +
+              coord_flip()
+  
+plot3=plot2 + scale_y_continuous(breaks=seq(0,18, by=3),
+                                 limits = c(0, 18), 
+                                 labels=scales::unit_format(suffix = '%'))     
+plot4 = plot3 + labs(title=ttl,
+                     x="Days", 
+                     y="Percent",
+                     caption=source)
+
+plot5 = plot4 + theme(panel.background = element_rect(fill = "white",colour = "grey20"),
+                      plot.caption = element_text(hjust = 0), 
+                      plot.title = element_text(hjust = 0.5),
+                      axis.text.y= element_text(size=8))
+plot5
+```
+```{r}
+### Bivariate graph
+#str(brfssdata$mental)
+#crimeYearGG=crimeY2000[complete.cases(crimeY2000$YearsToReport),]
+mentalbiv=table(brfssdata2$mental,brfssdata2$stab)
+
+biv=prop.table(mentalbiv)
+biv=biv*100
+
+bivdata=as.data.frame(biv)
+names(bivdata)=c("Days","State","Frequency")
+bivdata
+```
+```{r}
+boxbase = ggplot(data=bivdata, aes(x=State, y=Days))
+#ggplot(MentalTdf,aes(x=factor(mentd), y=Frequency())) 
+box  = boxbase + geom_boxplot()
+box
+```
+
+```{r}
+boxplot(mental~stab,data=brfssdata2[(brfssdata2$mental>0),])
+```
+
+
+
+```{r}
+table(brfssdata2$ex2018,exclude = 'nothing')
+```
+
+
+
+

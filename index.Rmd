@@ -9,6 +9,11 @@ output:
 # call libraries:
 library(ggplot2)
 library(haven)
+library(Rmisc)
+library(ggpubr)
+library(tibble)
+library(ggrepel)
+library(magrittr)
 ```
 
 ```{r loaddata, eval=TRUE}
@@ -67,9 +72,12 @@ plot5
 ### Bivariate graph
 #str(brfssdata$mental)
 #crimeYearGG=crimeY2000[complete.cases(crimeY2000$YearsToReport),]
-(statetot=table(brfssdata2$mental,brfssdata2$stab)%>%prop.table()%>%"*"(100)%>%round(2))
-statetot
+(statetot=table(brfssdata2$mental, exclude=0,brfssdata2$stab)%>%prop.table()%>%"*"(100)%>%round(2))
+statefr=as.data.frame(statetot)
+names(statefr)=c("Days","State","Frequency")
+statefr$Days=as.numeric(statefr$Days)
 ```
+
 ```{r}
 mentalbiv=table(brfssdata2$mental,brfssdata2$stab)
 
@@ -79,12 +87,8 @@ bivdata$Days=as.numeric(bivdata$Days)
 bivdata
 ```
 
-
 ```{r}
-statefr=as.data.frame(statetot)
-names(statefr)=c("Days","State","Frequency")
-boxbase = ggplot(data=bivdata, aes(x=State, y=Days))
-
+boxbase = ggplot(data=statefr, aes(x=factor(State), y=Frequency))
 box  = boxbase + geom_boxplot()
 box
 ```

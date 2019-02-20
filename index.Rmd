@@ -67,21 +67,32 @@ plot5
 ### Bivariate graph
 #str(brfssdata$mental)
 #crimeYearGG=crimeY2000[complete.cases(crimeY2000$YearsToReport),]
-mentalbiv=table(brfssdata2$mental,brfssdata2$stab)
-
-biv=prop.table(mentalbiv)
-biv=biv*100
-
-bivdata=as.data.frame(biv)
-names(bivdata)=c("Days","State","Frequency")
-bivdata
+(statetot=table(brfssdata2$mental,brfssdata2$stab)%>%prop.table()%>%"*"(100)%>%round(2))
+statetot
 ```
 ```{r}
+mentalbiv=table(brfssdata2$mental,brfssdata2$stab)
+
+bivdata=as.data.frame(mentalbiv)
+names(bivdata)=c("Days","State","Frequency")
+bivdata$Days=as.numeric(bivdata$Days)
+bivdata
+```
+
+
+```{r}
+statefr=as.data.frame(statetot)
+names(statefr)=c("Days","State","Frequency")
 boxbase = ggplot(data=bivdata, aes(x=State, y=Days))
-#ggplot(MentalTdf,aes(x=factor(mentd), y=Frequency())) 
+
 box  = boxbase + geom_boxplot()
 box
 ```
+```{r}
+boxplot(as.numeric(statefr$Days))
+```
+
+
 
 ```{r}
 boxplot(mental~stab,data=brfssdata2[(brfssdata2$mental>0),])

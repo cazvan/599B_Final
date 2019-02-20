@@ -6,12 +6,13 @@ output:
 ---
  
 ```{r libraries, eval=TRUE}
+# call libraries:
 library(ggplot2)
 library(haven)
 ```
 
-
 ```{r loaddata, eval=TRUE}
+# import data (~800mb):
 datalink='https://dl.dropboxusercontent.com/s/xhs2utpj1wntmzt/BRFSSFinalSup.dta'
 brfssdata=read_dta(datalink)
 ```
@@ -26,17 +27,14 @@ mentalT=table(brfssdata2$mental,exclude=0)
 MentalT2=prop.table(mentalT)
 MentalT2=MentalT2*100
 
-
 MentalTdf=as.data.frame(MentalT2)
 names(MentalTdf)=c("mentd","Frequency")
 MentalTdf
-
-
-
 ```
 
 
 ```{r univar, eval=TRUE}
+### Univariate graph
 source="BRFSS Survey Data 2000-2018"
 ttl="Proportion of Negative Mental Health Cases Reported (in Days)"
 
@@ -64,6 +62,35 @@ plot5 = plot4 + theme(panel.background = element_rect(fill = "white",colour = "g
                       plot.title = element_text(hjust = 0.5),
                       axis.text.y= element_text(size=8))
 plot5
+```
+```{r}
+### Bivariate graph
+#str(brfssdata$mental)
+#crimeYearGG=crimeY2000[complete.cases(crimeY2000$YearsToReport),]
+mentalbiv=table(brfssdata2$mental,brfssdata2$stab)
+
+biv=prop.table(mentalbiv)
+biv=biv*100
+
+bivdata=as.data.frame(biv)
+names(bivdata)=c("Days","State","Frequency")
+bivdata
+```
+```{r}
+boxbase = ggplot(data=bivdata, aes(x=State, y=Days))
+#ggplot(MentalTdf,aes(x=factor(mentd), y=Frequency())) 
+box  = boxbase + geom_boxplot()
+box
+```
+
+```{r}
+boxplot(mental~stab,data=brfssdata2[(brfssdata2$mental>0),])
+```
+
+
+
+```{r}
+table(brfssdata2$ex2018,exclude = 'nothing')
 ```
 
 

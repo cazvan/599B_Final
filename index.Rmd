@@ -14,6 +14,7 @@ library(ggpubr)
 library(tibble)
 library(ggrepel)
 library(magrittr)
+library(dplyr)
 ```
 
 ```{r loaddata, eval=TRUE}
@@ -22,7 +23,7 @@ datalink='https://dl.dropboxusercontent.com/s/xhs2utpj1wntmzt/BRFSSFinalSup.dta'
 brfssdata=read_dta(datalink)
 ```
 
-```{r removena, eval=TRUE}
+```{r}
 brfssdata2=brfssdata[complete.cases(brfssdata), ]
 ```
 
@@ -36,7 +37,6 @@ MentalTdf=as.data.frame(MentalT2)
 names(MentalTdf)=c("mentd","Frequency")
 MentalTdf
 ```
-
 
 ```{r univar, eval=TRUE}
 ### Univariate graph
@@ -68,19 +68,17 @@ plot5 = plot4 + theme(panel.background = element_rect(fill = "white",colour = "g
                       axis.text.y= element_text(size=8))
 plot5
 ```
+
 ```{r}
-### Bivariate graph
-#str(brfssdata$mental)
-#crimeYearGG=crimeY2000[complete.cases(crimeY2000$YearsToReport),]
-(statetot=table(brfssdata2$mental, exclude=0,brfssdata2$stab)%>%prop.table()%>%"*"(100)%>%round(2))
+(statetot=table(brfssdata2$mental,exclude=0,brfssdata2$stab)%>%prop.table()%>%"*"(100)%>%round(2))
 statefr=as.data.frame(statetot)
 names(statefr)=c("Days","State","Frequency")
 statefr$Days=as.numeric(statefr$Days)
+statefr
 ```
 
 ```{r}
 mentalbiv=table(brfssdata2$mental,brfssdata2$stab)
-
 bivdata=as.data.frame(mentalbiv)
 names(bivdata)=c("Days","State","Frequency")
 bivdata$Days=as.numeric(bivdata$Days)
@@ -88,15 +86,31 @@ bivdata
 ```
 
 ```{r}
-boxbase = ggplot(data=statefr, aes(x=factor(State), y=Frequency))
-box  = boxbase + geom_boxplot()
+newdat=brfssdata2[(brfssdata2$stab) & (brfssdata2$mental),]
+crimeYearGG=crimeY2000[complete.cases(crimeY2000$YearsToReport),]
+
+df$mental=as.numeric(brfssdata$mental)
+df=brfssdata[complete.cases(brfssdata$mental>0),]
+```
+
+```{r}
+myOrders = df %>% group_by(state) %>% mutate(median = median(value)) %>% ungroup() %>% select(state, median) %>% unique() %>% arrange(value) %>% mutate(state = as.character(state)
+```
+
+
+```{r}
+
+df2 = brfssdata[brfssdata$mental > 0,]
+
+boxbase = ggplot(data=df2, aes(x=factor(stab), y=mental))
+box  = boxbase + geom_boxplot() + coord_flip()
 box
 ```
+
+
 ```{r}
-boxplot(as.numeric(statefr$Days))
+
 ```
-
-
 
 ```{r}
 boxplot(mental~stab,data=brfssdata2[(brfssdata2$mental>0),])

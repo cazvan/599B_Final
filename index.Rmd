@@ -88,19 +88,27 @@ bivdata
 ```{r}
 newdat=brfssdata2[(brfssdata2$stab) & (brfssdata2$mental),]
 crimeYearGG=crimeY2000[complete.cases(crimeY2000$YearsToReport),]
-
-df$mental=as.numeric(brfssdata$mental)
-df=brfssdata[complete.cases(brfssdata$mental>0),]
 ```
 
 ```{r}
-myOrders = df %>% group_by(state) %>% mutate(median = median(value)) %>% ungroup() %>% select(state, median) %>% unique() %>% arrange(value) %>% mutate(state = as.character(state)
+df=brfssdata[complete.cases(brfssdata$mental),]
+df$mental=as.numeric(df$mental)
 ```
 
+```{r}
+dford = df %>% 
+  group_by(stab) %>% 
+  mutate(myMedian = median(mental)) %>% 
+  ungroup() %>% 
+  select(stab, myMedian) %>% 
+  unique() %>% 
+  arrange(mental) %>% 
+  mutate(stab = as.character(stab))
+```
 
 ```{r}
-
 df2 = brfssdata[brfssdata$mental > 0,]
+df2$mental=as.numeric(df2$mental)
 
 boxbase = ggplot(data=df2, aes(x=factor(stab), y=mental))
 box  = boxbase + geom_boxplot() + coord_flip()
@@ -109,17 +117,7 @@ box
 
 
 ```{r}
-
-```
-
-```{r}
-boxplot(mental~stab,data=brfssdata2[(brfssdata2$mental>0),])
-```
-
-
-
-```{r}
-table(brfssdata2$ex2018,exclude = 'nothing')
+df %>% select(stab, mental)
 ```
 
 

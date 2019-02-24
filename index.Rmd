@@ -1,5 +1,5 @@
 ---
-title: "Homework 1-Univar"
+title: "599B Final Project (Caz VanDevere, Hanson Shi, Ana Chkeidze"
 output:
   html_document:
     df_print: paged
@@ -15,113 +15,119 @@ library(tibble)
 library(ggrepel)
 library(magrittr)
 library(dplyr)
+library(reshape2)
+library(Hmisc)
 ```
 
 ```{r loaddata, eval=TRUE}
-# import data (~800mb):
+# import data (~250b):
 datalink='https://dl.dropboxusercontent.com/s/rpjq0x1bgzgdvh1/BRFSS599B.dta'
-brfssdata=read_dta(datalink)
+brfssdata_orig=read_dta(datalink)
+```
+
+```{r loaddata, eval=TRUE}
+#trim dataframe:
+brfssdata=brfssdata_orig%>%
+   select(mental, stab, ex2014,ex2015,ex2016,ex2017,ex2018, year)%>%
+   filter(!is.na(stab))%>%
+   filter(!is.na(mental))%>%
+   filter(!is.na(year))%>%
+   filter(!is.na(ex2014))%>%
+   filter(!is.na(ex2015))%>%
+   filter(!is.na(ex2016))%>%
+   filter(!is.na(ex2017))%>%
+   filter(!is.na(ex2018))%>%
+   filter((year!=2018))
+write.csv(brfssdata,"brfss.csv",row.names = FALSE)
+# head(brfssdata)
+# dim(brfssdata)
+#brfssdata = read.csv("brfss.csv")
 ```
 
 ```{r}
-brfssdata2=brfssdata[complete.cases(brfssdata), ]
-```
-
-```{r barplotprep,eval=TRUE}
-#data prep for univariate barplot:
-mentalT=table(brfssdata2$mental,exclude=0)
-
-MentalT2=prop.table(mentalT)
-MentalT2=MentalT2*100
-
-MentalTdf=as.data.frame(MentalT2)
-names(MentalTdf)=c("mentd","Frequency")
-MentalTdf
-```
-
-```{r univar, eval=TRUE}
-### Univariate barplot:
-source="BRFSS Survey Data 2000-2018"
-ttl="Proportion of Negative Mental Health Cases Reported (in Days)"
-
-plot1=ggplot(data=MentalTdf, aes(x=mentd, y=Frequency))
-plot2=plot1 + geom_bar(fill ="grey", 
-                       col="black",
-                       lwd=0.3,
-                       stat = 'identity')+ 
-              geom_text(aes(y =Frequency, 
-                            label = paste0(round(Frequency,2), '%')),
-                        hjust=-0.09, 
-                        size = 3) +
-              coord_flip()
-  
-plot3=plot2 + scale_y_continuous(breaks=seq(0,18, by=3),
-                                 limits = c(0, 18), 
-                                 labels=scales::unit_format(suffix = '%'))     
-plot4 = plot3 + labs(title=ttl,
-                     x="Days", 
-                     y="Percent",
-                     caption=source)
-
-plot5 = plot4 + theme(panel.background = element_rect(fill = "white",colour = "grey20"),
-                      plot.caption = element_text(hjust = 0), 
-                      plot.title = element_text(hjust = 0.5),
-                      axis.text.y= element_text(size=8))
-plot5
+#these four states expanded late ("AK" "LA" "MT" "PA"):
+brfssdata$stab=as.character(brfssdata$stab)
+bad=unique(brfssdata$stab[(brfssdata$ex2014 == 0 & brfssdata$ex2015 == 1) | 
+                     (brfssdata$ex2014 == 0 & brfssdata$ex2016 == 1) | 
+                       (brfssdata$ex2014 == 0 & brfssdata$ex2017 == 1) | 
+                         (brfssdata$ex2014 == 0 & brfssdata$ex2018 == 1)])
 ```
 
 ```{r}
-(statetot=table(brfssdata2$mental,exclude=0,brfssdata2$stab)%>%prop.table()%>%"*"(100)%>%round(2))
-statefr=as.data.frame(statetot)
-names(statefr)=c("Days","State","Frequency")
-statefr$Days=as.numeric(statefr$Days)
-statefr
+source1="BRFSS Survey Data 2000-2018"
+title1="Survey Count by Year"
+
+yearplot=ggplot(data= brfssdata[brfssdata$year != 2018,], aes(x=year)) + 
+  geom_bar(stat = "count", fill="slateblue") +
+  labs(title=title1, x=NULL, y=NULL,caption=source1) +  
+  scale_y_continuous(labels = scales::comma) +
+  scale_x_continuous(breaks=c(2000:2017)) +
+  theme(panel.background = element_rect(fill = "white",colour = "grey50"),
+                              plot.caption = element_text(hjust = 0), # default was 1
+                              plot.title = element_text(hjust = 0.5),
+                              axis.text.x = element_text(angle = -30, hjust = 0))
+yearplot
 ```
 
 ```{r}
-mentalbiv=table(brfssdata2$mental,brfssdata2$stab)
-bivdata=as.data.frame(mentalbiv)
-names(bivdata)=c("Days","State","Frequency")
-bivdata$Days=as.numeric(bivdata$Days)
-bivdata
+#melt dataframe (jk, it's long already)
+#pipe=%>% (this is from dplyr) 
+dfmelt=brfssdata%>%
+  select(year, stab, mental, ex2014)%>%
+  filter(stab %nin% bad)%>%
+  filter(!is.na(ex2014))%>%
+  group_by(year,ex2014)%>%
+  mutate(mentavg=mean(mental, na.rm = TRUE))%>%
+  ungroup()%>%
+  select(year, ex2014,mentavg)%>%
+  unique()%>%
+  mutate(ex2014=ifelse(ex2014==0, "No Expansion", "Expansion"))
+#View(dfmelt)
+#sum(is.na(brfssdata$mental[brfssdata$year==2014 & brfssdata$ex2014==0]))
 ```
 
 ```{r}
-newdat=brfssdata2[(brfssdata2$stab) & (brfssdata2$mental),]
+#make picture
+ggplot(dfmelt[dfmelt$year != 2018,], aes(x=year, y = mentavg, group = ex2014)) +
+  geom_line(aes(color=ex2014)) +
+  geom_vline(xintercept=2014) +
+  scale_x_continuous(breaks=c(2000:2018)) +
+  theme(panel.background = element_rect(fill = "white",colour = "grey50"),
+                              plot.caption = element_text(hjust = 0), # default was 1
+                              plot.title = element_text(hjust = 0.5),
+                              axis.text.x = element_text(angle = -30, hjust = 0)) #+
+  #facet_grid(ex2014~.) #gender? Income bracket?
 ```
 
 ```{r}
-df=brfssdata[complete.cases(brfssdata$mental),]
-df$mental=as.numeric(df$mental)
+#make picture
+dfmeltstab=brfssdata%>%
+  select(year, stab, mental, ex2014)%>%
+  filter(stab %nin% bad)%>%
+  filter(!is.na(ex2014))%>%
+  group_by(year,stab,ex2014)%>%
+  mutate(mentavg=mean(mental, na.rm = TRUE))%>%
+  ungroup()%>%
+  select(year, ex2014,mentavg,stab)%>%
+  unique()%>%
+  mutate(ex2014=ifelse(ex2014==0, "No Expansion", "Expansion"))
+
+ggplot(dfmeltstab[dfmeltstab$year != 2018], aes(x=year, y = mentavg, group = stab)) +
+  geom_line(aes(color=ex2014)) +
+  geom_vline(xintercept=2014) +
+  scale_x_continuous(breaks=c(2000:2018)) +
+  theme(panel.background = element_rect(fill = "white",colour = "grey50"),
+                              plot.caption = element_text(hjust = 0), # default was 1
+                              plot.title = element_text(hjust = 0.5),
+                              axis.text.x = element_text(angle = -30, hjust = 0))
 ```
+
+
 
 ```{r}
-dford = df %>% 
-  group_by(stab) %>% 
-  mutate(myMedian = median(df$mental)) %>% 
-  ungroup() %>% 
-  select(stab, myMedian) %>% 
-  unique() %>% 
-  arrange(df$mental) %>% 
-  mutate(stab = as.character(stab))
+unique(brfssdata$year)
+table(brfssdata$year)
 ```
-
-```{r}
-#boxplot for individual state data: (maybe choose the highest state, lowest state, and an average state?)
-df2 = brfssdata[brfssdata$mental > 0,]
-df2$mental=as.numeric(df2$mental)
-
-boxbase = ggplot(data=df2, aes(x=factor(stab), y=mental))
-box  = boxbase + geom_boxplot() + coord_flip()
-box
-```
-```{r}
-#dif-in-dif line plot, showing difference in means between expansion vs. non-expansion:
-
-
-```
-
-
 
 
 

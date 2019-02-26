@@ -43,7 +43,7 @@ brfssdata_orig=read_dta(datalink)
 
 ```{r}
 # import data (~90mb):
-brfssdata=read.csv("https://github.com/cazvan/599B_Final/raw/master/brfss.csv")
+#brfssdata=read.csv("https://github.com/cazvan/599B_Final/raw/master/brfss.csv")
 ```
 
 
@@ -208,6 +208,10 @@ brfsssex=brfssdata_orig%>%
    filter((year!=2018))
 #head(brfsssex)
 #dim(brfsssex)
+```
+
+```{r}
+dataset=read.csv('https://github.com/EvanLih/PUBPOL599_Right_To_Work/raw/master/Evan_Lih/Cleaned_RTW_Dataset.csv')
 ```
 
 

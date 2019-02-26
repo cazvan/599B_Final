@@ -19,7 +19,7 @@ library(reshape2)
 library(Hmisc)
 ```
 
-```{r, loaddata, eval=TRUE, echo=FALSE}
+```{r, loaddata, eval=TRUE}
 #import data (~250mb):
 datalink='https://dl.dropboxusercontent.com/s/rpjq0x1bgzgdvh1/BRFSS599B.dta'
 brfssdata_orig=read_dta(datalink)
@@ -43,7 +43,7 @@ brfssdata_orig=read_dta(datalink)
 
 ```{r}
 # import data (~90mb):
-brsffdata=read.csv("https://github.com/cazvan/599B_Final/raw/master/brfss.csv")
+brfssdata=read.csv("https://github.com/cazvan/599B_Final/raw/master/brfss.csv")
 ```
 
 
@@ -92,10 +92,10 @@ dfmelt=brfssdata%>%
 # Multi-variate Visualization: line plot
 ## this plot shows the average mental health number reported each year for 
 ## states that expanded ACA vs. states that didnt expand ACA
-ggplot(dfmelt[dfmelt$year != 2018,], aes(x=year, y = mentavg, group = ex2014)) +
+ggplot(dfmelt, aes(x=year, y = mentavg, group = ex2014)) +
   geom_line(aes(color=ex2014)) +
   geom_vline(xintercept=2014) +
-  scale_x_continuous(breaks=c(2000:2018)) +
+  scale_x_continuous(breaks=c(2000:2017)) +
   theme(panel.background = element_rect(fill = "white",colour = "grey50"),
                               plot.caption = element_text(hjust = 0), # default was 1
                               plot.title = element_text(hjust = 0.5),
@@ -121,7 +121,7 @@ dfmeltstab=brfssdata%>%
 ggplot(dfmeltstab, aes(x=year, y = mentavg, group = stab)) +
   geom_line(aes(color=ex2014)) +
   geom_vline(xintercept=2014) +
-  scale_x_continuous(breaks=c(2000:2018)) +
+  scale_x_continuous(breaks=c(2000:2017)) +
   theme(panel.background = element_rect(fill = "white",colour = "grey50"),
                               plot.caption = element_text(hjust = 0), # default was 1
                               plot.title = element_text(hjust = 0.5),
@@ -132,6 +132,67 @@ ggplot(dfmeltstab, aes(x=year, y = mentavg, group = stab)) +
 !!!!! EVERYTHING BELOW THIS LINE IS EXPERIMENTAL  !!!!
 
 
+
+```{r loaddata, eval=TRUE}
+# Create secondary dataframe:
+brfsssex=brfssdata_orig%>%
+   select(mental, sex, year, stab, ex2014)%>%
+   filter(!is.na(mental))%>%
+   filter(!is.na(sex))%>%
+   filter(!is.na(year))%>%
+   filter(!is.na(stab))%>%
+   filter(!is.na(ex2014))%>%
+   filter((year!=2018))
+#head(brfsssex)
+#dim(brfsssex)
+```
+
+```{r}
+#Data prep for multivariate visualization: for sex, edulevel, and income
+#melt dataframe (jk, it's long already)
+#pipe=%>% (this is from dplyr) 
+dfsex=brfssdata_orig%>%
+  select(year, stab, mental, ex2014, sex)%>%
+  filter(stab %nin% bad)%>%
+  filter(!is.na(ex2014))%>%
+  group_by(sex,year,ex2014)%>%
+  mutate(mentavg=mean(mental, na.rm = TRUE))%>%
+  ungroup()%>%
+  select(year, ex2014,mentavg,sex)%>%
+  unique()%>%
+  mutate(ex2014=ifelse(ex2014==0, "No Expansion", "Expansion"))%>%
+  filter((year!=2018))
+
+dfsex$sex <- ordered(dfsex$sex,
+  levels = c(1,0),
+  labels = c("Males", "Females"))
+
+View(dfsex)
+```
+
+```{r}
+# Multi-variate Visualization: line plot for sex, income, and education level:
+## this plot shows the average mental health number reported each year for 
+## states that expanded ACA vs. states that didnt expand ACA
+titlesex="Negative Mental Health Days by Sex by Expansion Group"
+
+ggplot(dfsex, aes(x=year, y = mentavg, group = ex2014)) +
+  geom_line(aes(color=ex2014)) +
+  geom_vline(xintercept=2014) +
+  scale_x_continuous(breaks=c(2000:2017)) +
+  labs(title=titlesex, x=NULL, y=NULL,caption=source1) +
+  theme(panel.background = element_rect(fill = "white",colour = "grey50"),
+                              plot.caption = element_text(hjust = 0), # default was 1
+                              plot.title = element_text(hjust = 0.5),
+                              axis.text.x = element_text(angle = 30, hjust = 1)) + facet_grid(sex~.) #gender? Income bracket? Income bracket?
+```
+
+
+
+```{r}
+unique(brfssdata$year)
+table(brfssdata$year)
+```
 
 ```{r loaddata, eval=TRUE}
 # Create secondary dataframe:
@@ -147,44 +208,6 @@ brfsssex=brfssdata_orig%>%
    filter((year!=2018))
 #head(brfsssex)
 #dim(brfsssex)
-```
-
-```{r}
-#Data prep for multivariate visualization: for sex, edulevel, and income
-#melt dataframe (jk, it's long already)
-#pipe=%>% (this is from dplyr) 
-dfsex=brfsssex%>%
-  select(mental, sex, edu, income, year, stab, ex2014)%>%
-  filter(!is.na(sex))%>%
-  group_by(year,sex)%>%
-  mutate(mentavg=mean(mental, na.rm = TRUE))%>%
-  ungroup()%>%
-  select(year,sex,mentavg)%>%
-  unique()%>%
-  mutate(sex=ifelse(sex==0, "Female", "Male"))
-View(dfsex)
-```
-
-```{r}
-# Multi-variate Visualization: line plot for sex, income, and education level:
-## this plot shows the average mental health number reported each year for 
-## states that expanded ACA vs. states that didnt expand ACA
-ggplot(dfsex[dfsex$year != 2018,], aes(x=year, y = mentavg, group = sex)) +
-  geom_line(aes(color=sex)) +
-  geom_vline(xintercept=2014) +
-  scale_x_continuous(breaks=c(2000:2018)) +
-  theme(panel.background = element_rect(fill = "white",colour = "grey50"),
-                              plot.caption = element_text(hjust = 0), # default was 1
-                              plot.title = element_text(hjust = 0.5),
-                              axis.text.x = element_text(angle = 30, hjust = 1)) +
-                              facet_grid(ex2014~.) #sex? Income bracket?
-```
-
-
-
-```{r}
-unique(brfssdata$year)
-table(brfssdata$year)
 ```
 
 

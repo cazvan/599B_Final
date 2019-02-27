@@ -21,8 +21,8 @@ library(Hmisc)
 
 ```{r, loaddata, eval=TRUE}
 #import data (~250mb):
-datalink='https://dl.dropboxusercontent.com/s/rpjq0x1bgzgdvh1/BRFSS599B.dta'
-brfssdata_orig=read_dta(datalink)
+#datalink='https://dl.dropboxusercontent.com/s/rpjq0x1bgzgdvh1/BRFSS599B.dta'
+#brfssdata_orig=read_dta(datalink)
 ```
 
 ```{r loaddata, eval=TRUE, echo=FALSE}
@@ -43,7 +43,7 @@ brfssdata_orig=read_dta(datalink)
 
 ```{r}
 # import data (~90mb):
-#brfssdata=read.csv("https://github.com/cazvan/599B_Final/raw/master/brfss.csv")
+brfssdata=read.csv("https://github.com/cazvan/599B_Final/raw/master/brfss.csv")
 ```
 
 
@@ -101,6 +101,8 @@ ggplot(dfmelt, aes(x=year, y = mentavg, group = ex2014)) +
                               plot.title = element_text(hjust = 0.5),
                               axis.text.x = element_text(angle = 30, hjust = 1)) #+
   #facet_grid(ex2014~.) #gender? Income bracket?
+
+#add mean behavior line? Add annotation instead of reference line for 2014?
 ```
 
 ```{r}

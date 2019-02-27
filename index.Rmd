@@ -50,30 +50,14 @@ brfssdata=read.csv("https://github.com/cazvan/599B_Final/raw/master/brfss.csv")
 ```{r}
 #these four states expanded ACA after 2014 ("AK" "LA" "MT" "PA"):
 brfssdata$stab=as.character(brfssdata$stab)
+
 bad=unique(brfssdata$stab[(brfssdata$ex2014 == 0 & brfssdata$ex2016 == 1)])
 bad
 ```
 
 ```{r}
-#Univariate Visualization: barplot
-source1="BRFSS Survey Data 2000-2018"
-title1="Survey Count by Year"
-
-yearplot=ggplot(data= brfssdata, aes(x=year)) + 
-  geom_bar(stat = "count", fill="slateblue") +
-  labs(title=title1, x=NULL, y=NULL,caption=source1) +  
-  scale_y_continuous(labels = scales::comma) +
-  scale_x_continuous(breaks=c(2000:2017)) +
-  theme(panel.background = element_rect(fill = "white",colour = "grey50"),
-                              plot.caption = element_text(hjust = 0), # default was 1
-                              plot.title = element_text(hjust = 0.5),
-                              axis.text.x = element_text(angle = -30, hjust = 0))
-yearplot
-```
-
-```{r}
-#Data prep for multivariate visualization:
-#melt dataframe (jk, it's long already)
+#Data prep for visualization: Calculating annual mental averages grouped (expansion and non-expansion groups separated)
+#dataframe
 #pipe=%>% (this is from dplyr) 
 dfmelt=brfssdata%>%
   select(year, stab, mental, ex2014)%>%
@@ -89,7 +73,71 @@ dfmelt=brfssdata%>%
 ```
 
 ```{r}
-# Multi-variate Visualization: line plot
+#Data prep for visualization: Calculating annual mental averages ungrouped (expansion and non-expansion groups together, by year)
+#dataframe
+#pipe=%>% (this is from dplyr) 
+dfmelt2=brfssdata%>%
+  select(year, stab, mental)%>%
+  filter(stab %nin% bad)%>%
+  group_by(year)%>%
+  mutate(mentavg2=mean(mental, na.rm = TRUE))%>%
+  ungroup()%>%
+  select(year,mentavg2)%>%
+  unique()
+#View(dfmelt2)
+```
+
+```{r}
+#Univariate Visualization: Line Plot NEW YAY
+source1="BRFSS Survey Data 2000-2018"
+title1="Average Reported Negative Mental Health Days Per Year"
+
+ggplot(dfmelt2, aes(x=year, y = mentavg2)) +
+  labs(title=title1, x=NULL, y=NULL,caption=source1) + 
+  geom_line(aes(color="Average Days")) +
+  #geom_vline(xintercept=2014) +
+  scale_x_continuous(breaks=c(2000:2017)) +
+  theme(panel.background = element_rect(fill = "white",colour = "grey50"),
+                              plot.caption = element_text(hjust = 0), # default was 1
+                              plot.title = element_text(hjust = 0.5),
+                              axis.text.x = element_text(angle = 30, hjust = 1)) +
+  geom_hline(yintercept = mean(dfmelt2$mentavg2), #where
+                           linetype="dashed", 
+                           size=1.5, #thickness
+                           alpha=0.5)
+```
+  
+```{r}
+  
+geom_bar(stat = "count", fill="grey") +
+  labs(title=title1, x=NULL, y=NULL,caption=source1) +  
+  scale_y_continuous(labels = scales::comma) +
+  scale_x_continuous(breaks=c(2000:2017)) +
+  theme(panel.background = element_rect(fill = "white",colour = "grey50"),
+                              plot.caption = element_text(hjust = 0), # default was 1
+                              plot.title = element_text(hjust = 0.5),
+                              axis.text.x = element_text(angle = -30, hjust = 0))
+yearplot
+```
+
+```{r}
+#Univariate Visualization: barplot
+source1="BRFSS Survey Data 2000-2018"
+title1="Survey Count by Year"
+
+yearplot=ggplot(data= brfssdata, aes(x=year)) + 
+  geom_bar(stat = "count", fill="grey") +
+  labs(title=title1, x=NULL, y=NULL,caption=source1) +  
+  scale_y_continuous(labels = scales::comma) +
+  scale_x_continuous(breaks=c(2000:2017)) +
+  theme(panel.background = element_rect(fill = "white",colour = "grey50"),
+                              plot.caption = element_text(hjust = 0), # default was 1
+                              plot.title = element_text(hjust = 0.5),
+                              axis.text.x = element_text(angle = -30, hjust = 0))
+yearplot
+```
+```{r}
+# Multi-variate Visualization: Line plot
 ## this plot shows the average mental health number reported each year for 
 ## states that expanded ACA vs. states that didnt expand ACA
 ggplot(dfmelt, aes(x=year, y = mentavg, group = ex2014)) +
@@ -169,7 +217,7 @@ dfsex$sex <- ordered(dfsex$sex,
   levels = c(1,0),
   labels = c("Males", "Females"))
 
-View(dfsex)
+#View(dfsex)
 ```
 
 ```{r}
@@ -178,15 +226,15 @@ View(dfsex)
 ## states that expanded ACA vs. states that didnt expand ACA
 titlesex="Negative Mental Health Days by Sex by Expansion Group"
 
-ggplot(dfsex, aes(x=year, y = mentavg, group = ex2014)) +
-  geom_line(aes(color=ex2014)) +
+ggplot(dfsex, aes(x=year, y = mentavg, group = sex)) +
+  geom_line(aes(color=sex)) +
   geom_vline(xintercept=2014) +
   scale_x_continuous(breaks=c(2000:2017)) +
   labs(title=titlesex, x=NULL, y=NULL,caption=source1) +
   theme(panel.background = element_rect(fill = "white",colour = "grey50"),
                               plot.caption = element_text(hjust = 0), # default was 1
                               plot.title = element_text(hjust = 0.5),
-                              axis.text.x = element_text(angle = 30, hjust = 1)) + facet_grid(sex~.) #gender? Income bracket? Income bracket?
+                              axis.text.x = element_text(angle = 30, hjust = 1)) + facet_grid(ex2014~.) #gender? Income bracket? Income bracket?
 ```
 
 
@@ -210,10 +258,6 @@ brfsssex=brfssdata_orig%>%
    filter((year!=2018))
 #head(brfsssex)
 #dim(brfsssex)
-```
-
-```{r}
-dataset=read.csv('https://github.com/EvanLih/PUBPOL599_Right_To_Work/raw/master/Evan_Lih/Cleaned_RTW_Dataset.csv')
 ```
 
 

@@ -21,12 +21,28 @@ library(Hmisc)
 
 ```{r, loaddata, eval=TRUE}
 #import data (~250mb):
-#datalink='https://dl.dropboxusercontent.com/s/rpjq0x1bgzgdvh1/BRFSS599B.dta'
-#brfssdata_orig=read_dta(datalink)
-```
-
-```{r loaddata, eval=TRUE, echo=FALSE}
-#trim dataframe:
+# datalink='https://dl.dropboxusercontent.com/s/rpjq0x1bgzgdvh1/BRFSS599B.dta'
+# brfssdata_orig=read_dta(datalink)
+# ```
+# 
+# ```{r loaddata, eval=TRUE, echo=FALSE}
+# #trim dataframe:
+# brfssdata2=brfssdata_orig%>%
+#    select(mental, stab, ex2014,sex, year)%>%
+#    filter(!is.na(stab))%>%
+#    filter(!is.na(mental))%>%
+#    filter(!is.na(year))%>%
+#    filter(!is.na(ex2014))%>%
+#    filter(!is.na(sex))%>%
+#    filter((year!=2018))
+# write.csv(brfssdata2,"brfss2.csv",row.names = FALSE)
+# head(brfssdata2)
+# dim(brfssdata2)
+# brfssdata2 = read.csv("brfss2.csv")
+# ```
+# 
+# ```{r loaddata, eval=TRUE, echo=FALSE}
+# #trim dataframe:
 # brfssdata=brfssdata_orig%>%
 #    select(mental, stab, ex2014,ex2016, year)%>%
 #    filter(!is.na(stab))%>%
@@ -35,15 +51,16 @@ library(Hmisc)
 #    filter(!is.na(ex2014))%>%
 #    filter(!is.na(ex2016))%>%
 #    filter((year!=2018))
-# write.csv(brfssdata,"brfss.csv",row.names = FALSE)
+# write.csv(brfssdata2,"brfss.csv",row.names = FALSE)
 # head(brfssdata)
 # dim(brfssdata)
-#brfssdata = read.csv("brfss.csv")
+# brfssdata2 = read.csv("brfss.csv")
 ```
 
 ```{r}
 # import data (~90mb):
 brfssdata=read.csv("https://github.com/cazvan/599B_Final/raw/master/brfss.csv")
+brfssdata2=read.csv("https://github.com/cazvan/599B_Final/raw/master/brfss2.csv")
 ```
 
 
@@ -93,7 +110,7 @@ source1="BRFSS Survey Data 2000-2018"
 title1="Survey Count by Year"
 
 yearplot=ggplot(data= brfssdata, aes(x=year)) +
-  geom_bar(stat = "count", fill="grey") +
+  geom_bar(stat = "count", fill="steelblue") +
   labs(title=title1, x=NULL, y=NULL,caption=source1) +
   scale_y_continuous(labels = scales::comma) +
   scale_x_continuous(breaks=c(2000:2017)) +
@@ -131,7 +148,6 @@ ggplot(dfmelt2,aes(x=year, y = mentavg2)) +
 # Bi-variate Visualization: Line plot
 ## this plot shows the average mental health number reported each year for 
 ## states that expanded ACA vs. states that didnt expand ACA
-Anot="Total Average"
 ggplot(dfmelt, aes(x=year, y = mentavg, group = ex2014)) +
   labs(title=title1, x="Years", y="Average Mental Health Days",caption=source1) +
   geom_line(aes(color=ex2014)) +
@@ -159,7 +175,7 @@ annotate("text",x=2015.59,y=3.28,label="ACA Expension",size=3,alpha=0.7)+
 #Data prep for multivariate visualization: for sex, edulevel, and income
 #melt dataframe (jk, it's long already)
 #pipe=%>% (this is from dplyr) 
-dfsex=brfssdata_orig%>%
+dfsex=brfssdata2%>%
   select(year, stab, mental, ex2014, sex)%>%
   filter(stab %nin% bad)%>%
   filter(!is.na(ex2014))%>%
@@ -233,5 +249,3 @@ ggplot(dfmeltstab, aes(x=year, y = mentavg, group = stab)) +
                               plot.title = element_text(hjust = 0.5),
                               axis.text.x = element_text(angle = -30, hjust = 0))
 ```
-
-

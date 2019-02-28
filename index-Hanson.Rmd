@@ -1,5 +1,5 @@
 ---
-title: "599B Final Project (Caz VanDevere, Hanson Shi, Ana Chkeidze"
+title: "599B Final Project (Caz VanDevere, Hanson Shi, Ana Chkeidze)"
 output:
   html_document:
     df_print: paged
@@ -88,6 +88,23 @@ dfmelt2=brfssdata%>%
 ```
 
 ```{r}
+#Univariate Visualization: barplot
+source1="BRFSS Survey Data 2000-2018"
+title1="Survey Count by Year"
+
+yearplot=ggplot(data= brfssdata, aes(x=year)) +
+  geom_bar(stat = "count", fill="grey") +
+  labs(title=title1, x=NULL, y=NULL,caption=source1) +
+  scale_y_continuous(labels = scales::comma) +
+  scale_x_continuous(breaks=c(2000:2017)) +
+  theme(panel.background = element_rect(fill = "white",colour = "grey50"),
+                              plot.caption = element_text(hjust = 0), # default was 1
+                              plot.title = element_text(hjust = 0.5),
+                              axis.text.x = element_text(angle = -30, hjust = 0))
+yearplot
+```
+
+```{r}
 #Univariate Visualization: Line Plot NEW YAY
 source1="BRFSS Survey Data 2000-2018"
 title1="Average Negative Mental Health Days Over Last 30 Days"
@@ -109,37 +126,6 @@ ggplot(dfmelt2,aes(x=year, y = mentavg2)) +
   annotate("text",x=2017,y=3.455,label="mean",size=3,alpha=0.7)
                           
 ```
-  
-#```{r}
-  
-geom_bar(stat = "count", fill="grey") +
-  labs(title=title1, x=NULL, y=NULL,caption=source1) +  
-  scale_y_continuous(labels = scales::comma) +
-  scale_x_continuous(breaks=c(2000:2017)) +
-  theme(panel.background = element_rect(fill = "white",colour = "grey50"),
-                              plot.caption = element_text(hjust = 0), # default was 1
-                              plot.title = element_text(hjust = 0.5),
-                              axis.text.x = element_text(angle = -30, hjust = 0))
-yearplot
-```
-
-#```{r}
-#Univariate Visualization: barplot
-source1="BRFSS Survey Data 2000-2018"
-title1="Survey Count by Year"
-
-yearplot=ggplot(data= brfssdata, aes(x=year)) + 
-  geom_bar(stat = "count", fill="grey") +
-  labs(title=title1, x=NULL, y=NULL,caption=source1) +  
-  scale_y_continuous(labels = scales::comma) +
-  scale_x_continuous(breaks=c(2000:2017)) +
-  theme(panel.background = element_rect(fill = "white",colour = "grey50"),
-                              plot.caption = element_text(hjust = 0), # default was 1
-                              plot.title = element_text(hjust = 0.5),
-                              axis.text.x = element_text(angle = -30, hjust = 0))
-yearplot
-```
-
 
 ```{r}
 # Bi-variate Visualization: Line plot
@@ -170,50 +156,6 @@ annotate("text",x=2015.59,y=3.28,label="ACA Expension",size=3,alpha=0.7)+
 ```
 
 ```{r}
-#Graph average mental health by year; each line is a state
-dfmeltstab=brfssdata%>%
-  select(year, stab, mental, ex2014)%>%
-  filter(stab %nin% bad)%>%
-  filter(!is.na(ex2014))%>%
-  group_by(year,stab,ex2014)%>%
-  mutate(mentavg=mean(mental, na.rm = TRUE))%>%
-  ungroup()%>%
-  select(year, ex2014,mentavg,stab)%>%
-  unique()%>%
-  mutate(ex2014=ifelse(ex2014==0, "No Expansion", "Expansion"))
-```
-
-```{r}
-ggplot(dfmeltstab, aes(x=year, y = mentavg, group = stab)) +
-  geom_line(aes(color=ex2014)) +
-  geom_vline(xintercept=2014) +
-  scale_x_continuous(breaks=c(2000:2017)) +
-  theme(panel.background = element_rect(fill = "white",colour = "grey50"),
-                              plot.caption = element_text(hjust = 0), # default was 1
-                              plot.title = element_text(hjust = 0.5),
-                              axis.text.x = element_text(angle = -30, hjust = 0))
-```
-
-
-!!!!! EVERYTHING BELOW THIS LINE IS EXPERIMENTAL  !!!!
-
-
-
-```{r loaddata, eval=TRUE}
-# Create secondary dataframe:
-brfsssex=brfssdata_orig%>%
-   select(mental, sex, year, stab, ex2014)%>%
-   filter(!is.na(mental))%>%
-   filter(!is.na(sex))%>%
-   filter(!is.na(year))%>%
-   filter(!is.na(stab))%>%
-   filter(!is.na(ex2014))%>%
-   filter((year!=2018))
-#head(brfsssex)
-#dim(brfsssex)
-```
-
-```{r}
 #Data prep for multivariate visualization: for sex, edulevel, and income
 #melt dataframe (jk, it's long already)
 #pipe=%>% (this is from dplyr) 
@@ -226,7 +168,7 @@ dfsex=brfssdata_orig%>%
   ungroup()%>%
   select(year, ex2014,mentavg,sex)%>%
   unique()%>%
-  mutate(ex2014=ifelse(ex2014==0, "No Expansion", "Expansion"))%>%
+   mutate(ex2014=ifelse(ex2014==0, "No ACA Expansion", "ACA Expansion"))%>%
   filter((year!=2018))
 
 dfsex$sex <- ordered(dfsex$sex,
@@ -246,35 +188,50 @@ ggplot(dfsex, aes(x=year, y = mentavg, group = sex)) +
   geom_line(aes(color=sex)) +
   geom_vline(xintercept=2014) +
   scale_x_continuous(breaks=c(2000:2017)) +
-  labs(title=titlesex, x=NULL, y=NULL,caption=source1) +
+  labs(title=title1, x="Year", y="Days",caption=source1) +
   theme(panel.background = element_rect(fill = "white",colour = "grey50"),
                               plot.caption = element_text(hjust = 0), # default was 1
                               plot.title = element_text(hjust = 0.5),
-                              axis.text.x = element_text(angle = 30, hjust = 1)) + facet_grid(ex2014~.) #gender? Income bracket? Income bracket?
+                              axis.text.x = element_text(angle = 30, hjust = 1)) + 
+  facet_grid(ex2014~.) +#gender? Income bracket? Income bracket?
+geom_hline(yintercept = mean(dfmelt2$mentavg2), #where
+                           linetype="dashed",
+                           size=1, #thickness
+                           alpha=0.5)+
+  theme(legend.title = element_blank())+
+annotate("text",x=2017,y=3.55,label="mean",size=3,alpha=0.7)+
+annotate("text",x=2012.5,y=2.25,label="ACA Expension",size=3,alpha=0.7)+
+ scale_color_manual(values = c("steelblue","darkred"))
+
 ```
 
-
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!!!! EVERYTHING BELOW THIS LINE IS EXPERIMENTAL  !!!!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 ```{r}
-unique(brfssdata$year)
-table(brfssdata$year)
+#Graph average mental health by year; each line is a state
+dfmeltstab=brfssdata%>%
+  select(year, stab, mental, ex2014)%>%
+  filter(stab %nin% bad)%>%
+  filter(!is.na(ex2014))%>%
+  group_by(year,stab,ex2014)%>%
+  mutate(mentavg=mean(mental, na.rm = TRUE))%>%
+  ungroup()%>%
+  select(year, ex2014,mentavg,stab)%>%
+  unique()%>%
+  mutate(ex2014=ifelse(ex2014==0, "No ACA Expansion", "ACA Expansion"))
 ```
 
-```{r loaddata, eval=TRUE}
-# Create secondary dataframe:
-brfsssex=brfssdata_orig%>%
-   select(mental, sex, edu, income, year, stab, ex2014)%>%
-   filter(!is.na(mental))%>%
-   filter(!is.na(sex))%>%
-   filter(!is.na(edu))%>%
-   filter(!is.na(income))%>%
-   filter(!is.na(year))%>%
-   filter(!is.na(stab))%>%
-   filter(!is.na(ex2014))%>%
-   filter((year!=2018))
-#head(brfsssex)
-#dim(brfsssex)
+```{r}
+ggplot(dfmeltstab, aes(x=year, y = mentavg, group = stab)) +
+  geom_line(aes(color=ex2014)) +
+  geom_vline(xintercept=2014) +
+  scale_x_continuous(breaks=c(2000:2017)) +
+  theme(panel.background = element_rect(fill = "white",colour = "grey50"),
+                              plot.caption = element_text(hjust = 0), # default was 1
+                              plot.title = element_text(hjust = 0.5),
+                              axis.text.x = element_text(angle = -30, hjust = 0))
 ```
-
 
 

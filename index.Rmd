@@ -205,7 +205,7 @@ ggplot(dfsex, aes(x=year, y = mentavg, group = sex)) +
   geom_line(aes(color=sex)) +
   geom_vline(xintercept=2014) +
   scale_x_continuous(breaks=c(2000:2017)) +
-  labs(title=title1, x="Year", y="Days",caption=source1) +
+  labs(title=titlesex, x="Year", y="Days",caption=source1) +
   theme(panel.background = element_rect(fill = "white",colour = "grey50"),
                               plot.caption = element_text(hjust = 0), # default was 1
                               plot.title = element_text(hjust = 0.5),

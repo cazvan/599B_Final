@@ -7,4 +7,6 @@
 * Ana Chkheidze
 * Hanson Shi
 
-
+In the repo you can find:
+* The final report
+* The data used 

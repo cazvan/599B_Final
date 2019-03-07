@@ -1,5 +1,8 @@
 ---
-title: "599B Final Project (Caz VanDevere, Hanson Shi, Ana Chkeidze)"
+title: "How Did ACA Expansion Effect the Mental Health of Americans?"
+
+author: "Caz VanDevere, Hanson Shi, & Ana Chkeidze"
+date: "March 20, 2019"  
 output:
   html_document:
     df_print: paged
@@ -21,128 +24,126 @@ library(Hmisc)
 ```
 
 ```{r, loaddata, eval=TRUE}
-#import data (~250mb):
+#import data (~250mb)-this chunk imports the original data file that was stored in dropbox:
 # datalink='https://dl.dropboxusercontent.com/s/rpjq0x1bgzgdvh1/BRFSS599B.dta'
 # brfssdata_orig=read_dta(datalink)
 ```
 
-```{r loaddata, eval=TRUE, echo=FALSE}
-# #trim dataframe:
-# brfssdata2=brfssdata_orig%>%
-#    select(mental, stab, ex2014,sex, year)%>%
-#    filter(!is.na(stab))%>%
-#    filter(!is.na(mental))%>%
-#    filter(!is.na(year))%>%
-#    filter(!is.na(ex2014))%>%
-#    filter(!is.na(sex))%>%
-#    filter((year!=2018))
-# write.csv(brfssdata2,"brfss2.csv",row.names = FALSE)
-# head(brfssdata2)
-# dim(brfssdata2)
-# brfssdata2 = read.csv("brfss2.csv")
+```{r loaddata3, eval=TRUE}
+# #trim dataframe-because the original data file was 250mb, we need to trim it so it can be uploaded to GitHub. This chunk trims the data file and saves a csv in the working directory:
+# brfssdata=brfssdata_orig%>% # make a new list from the original dataset
+#    select(mental, stab, ex2014,ex2016, year)%>% # select the 5 variables we need for plots
+#    filter(!is.na(stab))%>% # filter out n/a responses
+#    filter(!is.na(mental))%>% # filter out n/a responses
+#    filter(!is.na(year))%>% # filter out n/a responses
+#    filter(!is.na(ex2014))%>% # filter out n/a responses
+#    filter(!is.na(ex2016))%>% # filter out n/a responses
+#    filter((year!=2018)) # filter responses from 2018 (it's a tiny sample and has weird averages)
+# write.csv(brfssdata,"brfss.csv",row.names = FALSE) # write the list into a csv
+# head(brfssdata) # look at the column names
+# dim(brfssdata) # look at the dimensions
+# brfssdata = read.csv("brfss.csv") # read back into RStudio if necessary
 ```
 
-```{r loaddata, eval=TRUE, echo=FALSE}
-#trim dataframe:
-# brfssdata=brfssdata_orig%>%
-#    select(mental, stab, ex2014,ex2016, year)%>%
-#    filter(!is.na(stab))%>%
-#    filter(!is.na(mental))%>%
-#    filter(!is.na(year))%>%
-#    filter(!is.na(ex2014))%>%
-#    filter(!is.na(ex2016))%>%
-#    filter((year!=2018))
-# write.csv(brfssdata,"brfss.csv",row.names = FALSE)
-# head(brfssdata)
-# dim(brfssdata)
-# brfssdata = read.csv("brfss.csv")
+```{r loaddata2, eval=TRUE}
+# #trim dataframe-this chunk also trims the original datafile into a smaller file, but saves different variables that are used in the multivariate plot:
+# brfssdata2=brfssdata_orig%>% # create a second list from the original dataset, with different variables
+#    select(mental, stab, ex2014,sex, year)%>% # select the 5 variables we need for plots
+#    filter(!is.na(stab))%>% # filter out n/a responses
+#    filter(!is.na(mental))%>% # filter out n/a responses
+#    filter(!is.na(year))%>% # filter out n/a responses
+#    filter(!is.na(ex2014))%>% # filter out n/a responses
+#    filter(!is.na(sex))%>% # filter out n/a responses
+#    filter((year!=2018)) # filter responses from 2018 (it's a tiny sample and has weird averages)
+# write.csv(brfssdata2,"brfss2.csv",row.names = FALSE) # write the list to csv
+# head(brfssdata2) # look at the column names
+# dim(brfssdata2) # look at the dimensions
+# brfssdata2 = read.csv("brfss2.csv") # 
 ```
 
 ```{r}
-# import data (~90mb):
+# import data (~90mb each)
+#this chunk imports the csv files that the previous two chunks uploaded to Github. Because these files are under 100mb, they were able to be uploaded
 brfssdata=read.csv("https://github.com/cazvan/599B_Final/raw/master/brfss.csv")
 brfssdata2=read.csv("https://github.com/cazvan/599B_Final/raw/master/brfss2.csv")
 ```
 
 
 ```{r}
-#these four states expanded ACA after 2014 ("AK" "LA" "MT" "PA") and are excluded from the results:
-brfssdata$stab=as.character(brfssdata$stab)
-
-bad=unique(brfssdata$stab[(brfssdata$ex2014 == 0 & brfssdata$ex2016 == 1)])
-bad
+#This chunk removes states that do not fit neatly into the categories we use in our plots. These four states expanded ACA after 2014 ("AK" "LA" "MT" "PA") and are excluded from the results:
+brfssdata$stab=as.character(brfssdata$stab) #convert stab into numeric
+bad=unique(brfssdata$stab[(brfssdata$ex2014 == 0 & brfssdata$ex2016 == 1)]) #create a list of the bad states
+bad # show us the bad states
 ```
 
 ```{r}
-#Data prep for visualization: Calculating annual mental averages grouped (expansion and non-expansion groups separated)
-#dataframe
+#Data prep for visualization: Calculate annual average negative mental days, grouped into expansion and non-expansion states
 #pipe=%>% (this is from dplyr) 
-dfmelt=brfssdata%>%
-  select(year, stab, mental, ex2014)%>%
-  filter(stab %nin% bad)%>%
-  filter(!is.na(ex2014))%>%
-  group_by(year,ex2014)%>%
-  mutate(mentavg=mean(mental, na.rm = TRUE))%>%
-  ungroup()%>%
-  select(year, ex2014,mentavg)%>%
-  unique()%>%
-  mutate(ex2014=ifelse(ex2014==0, "No Expansion", "Expansion"))
-#View(dfmelt)
+dfmelt=brfssdata%>% #use main dataset
+  select(year, stab, mental, ex2014)%>% #select these 4 variables for use
+  filter(stab %nin% bad)%>% # filter out bad states
+  filter(!is.na(ex2014))%>% #filter out n/a responses for ex2014 variable
+  group_by(year,ex2014)%>% # group responeses by year then ex2014
+  mutate(mentavg=mean(mental, na.rm = TRUE))%>% #create a new variable that is the average number of negative mental health days for each group created above
+  ungroup()%>% # ungroup the groups
+  select(year, ex2014,mentavg)%>% #select the year, ex2014, and newly created mentavg variables
+  unique()%>% #only look at unique responses
+  mutate(ex2014=ifelse(ex2014==0, "No Expansion", "Expansion")) #change the binary reponses to string responses
+#View(dfmelt) # view the dataframe to verify results
 ```
 
 ```{r}
-#Data prep for visualization: Calculating annual mental averages ungrouped (expansion and non-expansion groups together, by year)
-#dataframe
+#Data prep for visualization: Calculate annual average negative mental days, ungrouped (expansion and non-expansion groups together)
 #pipe=%>% (this is from dplyr) 
-dfmelt2=brfssdata%>%
-  select(year, stab, mental)%>%
-  filter(stab %nin% bad)%>%
-  group_by(year)%>%
-  mutate(mentavg2=mean(mental, na.rm = TRUE))%>%
-  ungroup()%>%
-  select(year,mentavg2)%>%
-  unique()
+dfmelt2=brfssdata%>% #use main dataset
+  select(year, stab, mental)%>% #select the 3 variables to be used
+  filter(stab %nin% bad)%>% # filter out the bad states
+  group_by(year)%>% # group by year
+  mutate(mentavg2=mean(mental, na.rm = TRUE))%>% # make a new variable for average negative mental days per year
+  ungroup()%>% # ungroup
+  select(year,mentavg2)%>% # select year and mentavg variables
+  unique() # only look at unique responses
 #View(dfmelt2)
 ```
 
 ```{r}
-#Data prep for multivariate visualization: for sex, edulevel, and income
-#melt dataframe (jk, it's long already)
+#Data prep for multivariate visualization, averaging annual negative mental health days by year, sex, and expansion vs. non-expansion state
 #pipe=%>% (this is from dplyr) 
-dfsex=brfssdata2%>%
-  select(year, stab, mental, ex2014, sex)%>%
-  filter(stab %nin% bad)%>%
-  filter(!is.na(ex2014))%>%
-  group_by(sex,year,ex2014)%>%
-  mutate(mentavg=mean(mental, na.rm = TRUE))%>%
-  ungroup()%>%
-  select(year, ex2014,mentavg,sex)%>%
-  unique()%>%
-   mutate(ex2014=ifelse(ex2014==0, "No ACA Expansion", "ACA Expansion"))%>%
-  filter((year!=2018))
+dfsex=brfssdata2%>% # name the new frame, use the second list
+  select(year, stab, mental, ex2014, sex)%>% #select the variables to be used
+  filter(stab %nin% bad)%>% #filter out the bad states
+  filter(!is.na(ex2014))%>% #filter out n/a answers from ex2014
+  group_by(sex,year,ex2014)%>% #group by sec, year, and ex2014 variables
+  mutate(mentavg=mean(mental, na.rm = TRUE))%>% #create a new variable for average mental days by sex,year, and expansion group
+  ungroup()%>% #ungroup the grouped variables
+  select(year, ex2014,mentavg,sex)%>% #select the 4 variables to be used
+  unique()%>% #group into unique answers
+  mutate(ex2014=ifelse(ex2014==0, "No ACA Expansion", "ACA Expansion"))%>% #rename expansion variable
+  filter((year!=2018)) #remove responses from 2018
 
-dfsex$sex <- ordered(dfsex$sex,
-  levels = c(1,0),
-  labels = c("Males", "Females"))
+#rename the binary sex variable to "male" and "female"
+dfsex$sex <- ordered(dfsex$sex, #order the variable from 1 to 0
+  levels = c(1,0), #select the binary numbers
+  labels = c("Males", "Females")) # choose the new names
 
 #View(dfsex)
 ```
 
 ```{r}
 #Univariate Visualization: barplot
-source1="BRFSS Survey Data 2000-2018"
-title1="Survey Count by Year"
+source1="BRFSS Survey Data 2000-2018" #source
+titlecount="Survey Count by Year" #title for the plot
 
-yearplot=ggplot(data= brfssdata, aes(x=year)) +
-  geom_bar(stat = "count", fill="steelblue") +
-  labs(title=title1, x=NULL, y=NULL,caption=source1) +
-  scale_y_continuous(labels = scales::comma) +
-  scale_x_continuous(breaks=c(2000:2017)) +
-  theme(panel.background = element_rect(fill = "white",colour = "grey50"),
-                              plot.caption = element_text(hjust = 0), # default was 1
-                              plot.title = element_text(hjust = 0.5),
-                              axis.text.x = element_text(angle = -30, hjust = 0))
-yearplot
+yearplot=ggplot(data= brfssdata, aes(x=year)) + # create the yearplot object using the main dataset
+  geom_bar(stat = "count", fill="steelblue") + # make the yearplot into a barplot, color it
+  labs(title=titlecount, x=NULL, y=NULL,caption=source1) + # use the labels created above
+  scale_y_continuous(labels = scales::comma) + # set the scale for the y axis
+  scale_x_continuous(breaks=c(2000:2017)) + # set the scale for the years on the x axis
+  theme(panel.background = element_rect(fill = "white",colour = "grey50"), # choose background colors
+                              plot.caption = element_text(hjust = 0), # default was 1 #set caption position 
+                              plot.title = element_text(hjust = 0.5), # set title position
+                              axis.text.x = element_text(angle = -30, hjust = 0)) # adjust the x axis labels
+yearplot # display the year plot
 ```
 
 ```{r}
@@ -172,8 +173,10 @@ ggplot(dfmelt2,aes(x=year, y = mentavg2)) +
 # Bi-variate Visualization: Line plot
 ## this plot shows the average mental health number reported each year for 
 ## states that expanded ACA vs. states that didnt expand ACA
+titlebi="Average Negative Mental Health Days Over Last 30 Days"
+source1="BRFSS Survey Data 2000-2018"
 ggplot(dfmelt, aes(x=year, y = mentavg, group = ex2014)) +
-  labs(title=title1, x="Years", y="Average Mental Health Days",caption=source1) +
+  labs(title=titlebi, x="Years", y="Average Mental Health Days",caption=source1) +
   geom_line(aes(color=ex2014)) +
   geom_vline(xintercept=2014,size=1, alpha=0.5) +
   scale_x_continuous(breaks=c(2000:2017)) +

@@ -22,40 +22,40 @@ library(Hmisc)
 
 ```{r, loaddata, eval=TRUE}
 #import data (~250mb):
-# datalink='https://dl.dropboxusercontent.com/s/rpjq0x1bgzgdvh1/BRFSS599B.dta'
-# brfssdata_orig=read_dta(datalink)
-# ```
-# 
-# ```{r loaddata, eval=TRUE, echo=FALSE}
-# #trim dataframe:
-# brfssdata2=brfssdata_orig%>%
-#    select(mental, stab, ex2014,sex, year)%>%
-#    filter(!is.na(stab))%>%
-#    filter(!is.na(mental))%>%
-#    filter(!is.na(year))%>%
-#    filter(!is.na(ex2014))%>%
-#    filter(!is.na(sex))%>%
-#    filter((year!=2018))
-# write.csv(brfssdata2,"brfss2.csv",row.names = FALSE)
-# head(brfssdata2)
-# dim(brfssdata2)
-# brfssdata2 = read.csv("brfss2.csv")
-# ```
-# 
-# ```{r loaddata, eval=TRUE, echo=FALSE}
-# #trim dataframe:
-# brfssdata=brfssdata_orig%>%
-#    select(mental, stab, ex2014,ex2016, year)%>%
-#    filter(!is.na(stab))%>%
-#    filter(!is.na(mental))%>%
-#    filter(!is.na(year))%>%
-#    filter(!is.na(ex2014))%>%
-#    filter(!is.na(ex2016))%>%
-#    filter((year!=2018))
-# write.csv(brfssdata2,"brfss.csv",row.names = FALSE)
-# head(brfssdata)
-# dim(brfssdata)
-# brfssdata2 = read.csv("brfss.csv")
+datalink='https://dl.dropboxusercontent.com/s/rpjq0x1bgzgdvh1/BRFSS599B.dta'
+brfssdata_orig=read_dta(datalink)
+```
+
+```{r loaddata, eval=TRUE, echo=FALSE}
+#trim dataframe:
+brfssdata2=brfssdata_orig%>%
+   select(mental, stab, ex2014,sex, year)%>%
+   filter(!is.na(stab))%>%
+   filter(!is.na(mental))%>%
+   filter(!is.na(year))%>%
+   filter(!is.na(ex2014))%>%
+   filter(!is.na(sex))%>%
+   filter((year!=2018))
+write.csv(brfssdata2,"brfss2.csv",row.names = FALSE)
+head(brfssdata2)
+dim(brfssdata2)
+brfssdata2 = read.csv("brfss2.csv")
+```
+
+```{r loaddata, eval=TRUE, echo=FALSE}
+#trim dataframe:
+brfssdata=brfssdata_orig%>%
+   select(mental, stab, ex2014,ex2016, year)%>%
+   filter(!is.na(stab))%>%
+   filter(!is.na(mental))%>%
+   filter(!is.na(year))%>%
+   filter(!is.na(ex2014))%>%
+   filter(!is.na(ex2016))%>%
+   filter((year!=2018))
+write.csv(brfssdata,"brfss.csv",row.names = FALSE)
+head(brfssdata)
+dim(brfssdata)
+brfssdata = read.csv("brfss.csv")
 ```
 
 ```{r}
@@ -66,11 +66,12 @@ brfssdata2=read.csv("https://github.com/cazvan/599B_Final/raw/master/brfss2.csv"
 
 
 ```{r}
-#these four states expanded ACA after 2014 ("AK" "LA" "MT" "PA"):
+#these four states expanded ACA after 2014 ("AK" "LA" "MT" "PA") and are excluded from the results:
 brfssdata$stab=as.character(brfssdata$stab)
 
 bad=unique(brfssdata$stab[(brfssdata$ex2014 == 0 & brfssdata$ex2016 == 1)])
 bad
+head(brfssdata)
 ```
 
 ```{r}

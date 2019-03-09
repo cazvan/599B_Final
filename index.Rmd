@@ -189,7 +189,7 @@ ggplot(dfmelt, aes(x=year, y = mentavg, group = ex2014)) + # create the line plo
                            alpha=0.5)+ # change line depth
   theme(legend.title = element_blank())+ # get rid of the legend
 annotate("text",x=2017,y=3.455,label="mean",size=3,alpha=0.7)+ # position the mean label
-annotate("text",x=2015.59,y=3.28,label="ACA Expension",size=3,alpha=0.7)+ # position the ACA Expension label
+annotate("text",x=2015.59,y=3.28,label="ACA Expansion",size=3,alpha=0.7)+ # position the ACA Expension label
  scale_color_manual(values = c("steelblue","darkred")) # manually change the line colors
   #scale_y_continuous(expand = 
   #facet_grid(ex2014~.) #gender? Income bracket?
@@ -197,30 +197,32 @@ annotate("text",x=2015.59,y=3.28,label="ACA Expension",size=3,alpha=0.7)+ # posi
 #add mean behavior line? Add annotation instead of reference line for 2014?
 ```
 
-```{r}
+We broke the analysis further down to examine the effects of ACA expansion on male and female respondents. Evidently, ACA expansion had similar effects on both groups in ACA and non ACA states, i.e. both groups experienced deteriorating mental health from that point onward. Moreover, the analysis shows an interesting result: on average, female respondents experienced more negative mental health days compared to their male counterparts for 18 years. 
+```{r multivar, eval=TRUE}
 # Multi-variate Visualization: line plot for sex, income, and education level:
 ## this plot shows the average mental health number reported each year for 
 ## states that expanded ACA vs. states that didnt expand ACA
-titlesex="Negative Mental Health Days by Sex by Expansion Group"
+titlesex="Negative Mental Health Days by Sex by Expansion Group" #give a title to the graph
 
-ggplot(dfsex, aes(x=year, y = mentavg, group = sex)) +
-  geom_line(aes(color=sex)) +
-  geom_vline(xintercept=2014) +
-  scale_x_continuous(breaks=c(2000:2017)) +
+ggplot(dfsex, aes(x=year, y = mentavg, group = sex)) + #create a lineplot using dfsex frame 
+  geom_line(aes(color=sex)) + # add a line to mark average mental days for 2 groups
+  geom_vline(xintercept=2014) + #add a vertical line to mark expansion year
+  scale_x_continuous(breaks=c(2000:2017)) + #include years 2000-2017
   scale_y_continuous(breaks=c(1,1.2,1.4,1.6,1.8,2,2.2,2.4,2.6,2.8,3,3.2,3.4,3.6,3.8,4,4.2)) +
-  labs(title=titlesex, x="Year", y="Days",caption=source1) +
-  theme(panel.background = element_rect(fill = "white",colour = "grey50"),
-                              plot.caption = element_text(hjust = 0), # default was 1
-                              plot.title = element_text(hjust = 0.5),
-                              axis.text.x = element_text(angle = 30, hjust = 1)) + 
-  facet_grid(ex2014~.) +#gender? Income bracket? Income bracket?
-geom_hline(yintercept = mean(dfmelt2$mentavg2), #where
-                           linetype="dashed",
+  #adjusting the y axis scale
+  labs(title=titlesex, x="Year", y="Days",caption=source1) + #give labels to the axis and     adding source
+  theme(panel.background = element_rect(fill = "white",colour = "grey50"), #change background                               color
+                              plot.caption = element_text(hjust = 0),# adjust caption position
+                              plot.title = element_text(hjust = 0.5), # adjust title position
+                              axis.text.x = element_text(angle = 30, hjust = 1)) + #adjust x                                axis to have an angle
+  facet_grid(ex2014~.) + #create two graphs according to ex2014
+  geom_hline(yintercept = mean(dfmelt2$mentavg2), #dd a horizontal line for the total mean
+                           linetype="dashed", #type of line
                            size=1, #thickness
-                           alpha=0.5)+
-  theme(legend.title = element_blank())+
-annotate("text",x=2017,y=3.55,label="mean",size=3,alpha=0.7)+
-annotate("text",x=2012.5,y=2.25,label="ACA Expension",size=3,alpha=0.7)+
- scale_color_manual(values = c("steelblue","darkred"))
+                           alpha=0.5)+ #transparency
+  theme(legend.title = element_blank())+ #get rid of the legend title
+  annotate("text",x=2017,y=3.55,label="mean",size=3,alpha=0.7)+ #position text 'mean'
+  annotate("text",x=2012.5,y=2.25,label="ACA Expansion",size=3,alpha=0.7)+ #position text 'ACA   Expansion'
+  scale_color_manual(values = c("steelblue","darkred")) #manually add the colors to the lines   for males/females
 
 ```

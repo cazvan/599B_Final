@@ -148,50 +148,49 @@ yearplot # display the year plot
 
 ```{r}
 #Univariate Visualization: Line Plot NEW YAY
-source1="BRFSS Survey Data 2000-2018"
-title1="Average Negative Mental Health Days Over Last 30 Days"
+source1="BRFSS Survey Data 2000-2018" #source
+title1="Average Negative Mental Health Days Over Last 30 Days" #title for the plot
 
-ggplot(dfmelt2,aes(x=year, y = mentavg2)) +
-  labs(title=title1, x="Year", y="Days",caption=source1) +
-  geom_line(color="steelblue",aes(), show.legend = TRUE) +
+ggplot(dfmelt2,aes(x=year, y = mentavg2)) + #create the lineplot using the new dataset
+  labs(title=title1, x="Year", y="Days",caption=source1) + # use the labels created above
+  geom_line(color="steelblue",aes(), show.legend = TRUE) + # color the line
   #geom_vline(xintercept=2014) +
-  scale_x_continuous(breaks=c(2000:2017)) +
-  theme(panel.background = element_rect(fill = "white",colour = "grey50"),
-                              plot.caption = element_text(hjust = 0), # default was 1
-                              plot.title = element_text(hjust = 0.5),
-                              axis.text.x = element_text(angle = 30, hjust = 1)) +
-  geom_hline(yintercept = mean(dfmelt2$mentavg2), #where
-                           linetype="dashed", 
-                           size=1, #thickness
-                           alpha=0.5)+
-  theme(legend.title = element_blank())+
-  annotate("text",x=2017,y=3.455,label="mean",size=3,alpha=0.7)
+  scale_x_continuous(breaks=c(2000:2017)) + #showing the exact year changes from 2000 to 2017 on x axis
+  theme(panel.background = element_rect(fill = "white",colour = "grey50"), # add plot theme and background colors
+                              plot.caption = element_text(hjust = 0), # default was 1, set caption position
+                              plot.title = element_text(hjust = 0.5), # set title position
+                              axis.text.x = element_text(angle = 30, hjust = 1)) + # adjust the x axis labels
+  geom_hline(yintercept = mean(dfmelt2$mentavg2), # add horizontal average line
+                           linetype="dashed", # make a dashed line 
+                           size=1, # change the line thickness
+                           alpha=0.5)+ # change the line depth
+  theme(legend.title = element_blank())+ # get rid of legend 
+  annotate("text",x=2017,y=3.455,label="mean",size=3,alpha=0.7) # position the label 
                           
 ```
 
 ```{r}
 # Bi-variate Visualization: Line plot
-## this plot shows the average mental health number reported each year for 
-## states that expanded ACA vs. states that didnt expand ACA
-titlebi="Average Negative Mental Health Days Over Last 30 Days"
-source1="BRFSS Survey Data 2000-2018"
-ggplot(dfmelt, aes(x=year, y = mentavg, group = ex2014)) +
-  labs(title=titlebi, x="Years", y="Average Mental Health Days",caption=source1) +
-  geom_line(aes(color=ex2014)) +
-  geom_vline(xintercept=2014,size=1, alpha=0.5) +
-  scale_x_continuous(breaks=c(2000:2017)) +
-  theme(panel.background = element_rect(fill = "white",colour = "grey50"),
-                              plot.caption = element_text(hjust = 0), # default was 1
-                              plot.title = element_text(hjust = 0.5),
-                              axis.text.x = element_text(angle = 30, hjust = 1))+
-    geom_hline(yintercept = mean(dfmelt2$mentavg2), #where
-                           linetype="dashed",
-                           size=1, #thickness
-                           alpha=0.5)+
-  theme(legend.title = element_blank())+
-annotate("text",x=2017,y=3.455,label="mean",size=3,alpha=0.7)+
-annotate("text",x=2015.59,y=3.28,label="ACA Expension",size=3,alpha=0.7)+
- scale_color_manual(values = c("steelblue","darkred"))
+## this plot shows the average mental health number reported each year for states that expanded ACA vs. states that didnt expand ACA.
+titlebi="Average Negative Mental Health Days Over Last 30 Days" # source
+source1="BRFSS Survey Data 2000-2018" # title for the plot
+ggplot(dfmelt, aes(x=year, y = mentavg, group = ex2014)) + # create the line plot using the new dataset
+  labs(title=titlebi, x="Years", y="Average Mental Health Days",caption=source1) + # use the labels create above
+  geom_line(aes(color=ex2014)) + # add the lines for each catagory 
+  geom_vline(xintercept=2014,size=1, alpha=0.5) + # add the vertical Expansion line on year 2014
+  scale_x_continuous(breaks=c(2000:2017)) + # change the x axis breaks to show each year from 2000 to 2017
+  theme(panel.background = element_rect(fill = "white",colour = "grey50"), # change the background color
+                              plot.caption = element_text(hjust = 0), # default was 1, set caption position
+                              plot.title = element_text(hjust = 0.5), # set title position
+                              axis.text.x = element_text(angle = 30, hjust = 1))+ # adjust the x axis labels
+    geom_hline(yintercept = mean(dfmelt2$mentavg2), # add horizontal average line
+                           linetype="dashed", # make a dashed line
+                           size=1, # change the line thickness 
+                           alpha=0.5)+ # change line depth
+  theme(legend.title = element_blank())+ # get rid of the legend
+annotate("text",x=2017,y=3.455,label="mean",size=3,alpha=0.7)+ # position the mean label
+annotate("text",x=2015.59,y=3.28,label="ACA Expension",size=3,alpha=0.7)+ # position the ACA Expension label
+ scale_color_manual(values = c("steelblue","darkred")) # manually change the line colors
   #scale_y_continuous(expand = 
   #facet_grid(ex2014~.) #gender? Income bracket?
 

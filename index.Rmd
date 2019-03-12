@@ -145,6 +145,7 @@ yearplot=ggplot(data= brfssdata, aes(x=year)) + # create the yearplot object usi
                               axis.text.x = element_text(angle = -30, hjust = 0)) # adjust the x axis labels
 yearplot # display the year plot
 ```
+The following line plot shows the overall effect of ACA expansion.  With an average of 3.44 days reported with negative mental health, we've witnessed a significant decrease for negative mental health in year 2002 and year 2014. After the ACA expansion in 2014, there is also a significant increase for negative mental health. 
 
 ```{r}
 #Univariate Visualization: Line Plot NEW YAY
@@ -168,6 +169,8 @@ ggplot(dfmelt2,aes(x=year, y = mentavg2)) + #create the lineplot using the new d
   annotate("text",x=2017,y=3.455,label="mean",size=3,alpha=0.7) # position the label 
                           
 ```
+
+The next question we ask is that is there any difference for states that expanded ACA verse those states that did not expand? The next plot shows that people living in the states that expanded ACA experienced more negative mental health than those living in the states that didn't expand ACA. However, after year 2014, there is a more significant increase for states that did not expand ACA.
 
 ```{r}
 # Bi-variate Visualization: Line plot

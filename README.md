@@ -7,6 +7,10 @@
 * Ana Chkheidze
 * Hanson Shi
 
+
+<img scr="https://github.com/cazvan/599B_Final/blob/master/Team%20Photo.png">
+
+
 In the repo you can find:
 * The final report
 * The data used 

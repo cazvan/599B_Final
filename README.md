@@ -15,4 +15,8 @@ In the repo you can find:
 * <a
 href="https://github.com/cazvan/599B_Final/blob/master/index.Rmd">The final report <a/>
 
-* The data used 
+* The data used: 
+* <a
+href="https://github.com/cazvan/599B_Final/blob/master/brfss.csv" Full Data <a/>
+* <a
+href="https://github.com/cazvan/599B_Final/blob/master/brfss2.csv"> Small Data <a/>

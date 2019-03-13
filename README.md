@@ -13,7 +13,7 @@
 
 In the repo you can find:
 * <a
-href="https://github.com/cazvan/599B_Final/blob/master/index.Rmd">The final report <a/>
+href="https://cazvan.github.io/599B_Final/">The final report <a/>
 
 * The data used: 
   * <a

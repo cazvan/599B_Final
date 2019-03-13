@@ -155,7 +155,6 @@ title1="Average Negative Mental Health Days Over Last 30 Days" #title for the pl
 ggplot(dfmelt2,aes(x=year, y = mentavg2)) + #create the lineplot using the new dataset
   labs(title=title1, x="Year", y="Days",caption=source1) + # use the labels created above
   geom_line(color="steelblue",aes(), show.legend = TRUE) + # color the line
-  #geom_vline(xintercept=2014) +
   scale_x_continuous(breaks=c(2000:2017)) + #showing the exact year changes from 2000 to 2017 on x axis
   theme(panel.background = element_rect(fill = "white",colour = "grey50"), # add plot theme and background colors
                               plot.caption = element_text(hjust = 0), # default was 1, set caption position
@@ -166,7 +165,7 @@ ggplot(dfmelt2,aes(x=year, y = mentavg2)) + #create the lineplot using the new d
                            size=1, # change the line thickness
                            alpha=0.5)+ # change the line depth
   geom_vline(xintercept=2014,size=1, alpha=0.5) + # add the vertical Expansion line on year 2014
-   theme(legend.title = element_blank())+ # get rid of legend 
+   theme(legend.title = element_blank())+ # get rid of legend title
   annotate("text",x=2017,y=3.455,label="mean",size=3,alpha=0.7) # position the label 
                           
 ```
@@ -191,7 +190,7 @@ ggplot(dfmelt, aes(x=year, y = mentavg, group = ex2014)) + # create the line plo
                            linetype="dashed", # make a dashed line
                            size=1, # change the line thickness 
                            alpha=0.5)+ # change line depth
-  theme(legend.title = element_blank())+ # get rid of the legend
+  theme(legend.title = element_blank())+ # get rid of the legend title
 annotate("text",x=2017,y=3.455,label="mean",size=3,alpha=0.7)+ # position the mean label
 annotate("text",x=2015.59,y=3.28,label="ACA Expansion",size=3,alpha=0.7)+ # position the ACA Expension label
  scale_color_manual(values = c("steelblue","darkred")) # manually change the line colors
@@ -201,7 +200,7 @@ annotate("text",x=2015.59,y=3.28,label="ACA Expansion",size=3,alpha=0.7)+ # posi
 #add mean behavior line? Add annotation instead of reference line for 2014?
 ```
 
-We broke the analysis further down to examine the effects of ACA expansion on male and female respondents. Evidently, ACA expansion had similar effects on both groups in ACA and non ACA states, i.e. both groups experienced deteriorating mental health from that point onward. Moreover, the analysis shows an interesting result: on average, female respondents experienced more negative mental health days compared to their male counterparts for 18 years. 
+We broke the analysis further down to examine the effects of ACA expansion on male and female respondents. Evidently, ACA expansion had similar effects on both groups in ACA and non-ACA states, i.e. both groups experienced deteriorating mental health from that point onward. Moreover, the analysis shows an interesting result: on average, female respondents experienced more negative mental health days compared to their male counterparts for 18 years. 
 ```{r multivar, eval=TRUE}
 # Multi-variate Visualization: line plot for sex, income, and education level:
 ## this plot shows the average mental health number reported each year for 

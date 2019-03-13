@@ -164,7 +164,8 @@ ggplot(dfmelt2,aes(x=year, y = mentavg2)) + #create the lineplot using the new d
                            linetype="dashed", # make a dashed line 
                            size=1, # change the line thickness
                            alpha=0.5)+ # change the line depth
-  theme(legend.title = element_blank())+ # get rid of legend 
+  geom_vline(xintercept=2014,size=1, alpha=0.5) + # add the vertical Expansion line on year 2014
+   theme(legend.title = element_blank())+ # get rid of legend 
   annotate("text",x=2017,y=3.455,label="mean",size=3,alpha=0.7) # position the label 
                           
 ```
@@ -226,3 +227,13 @@ ggplot(dfsex, aes(x=year, y = mentavg, group = sex)) + #create a lineplot using 
   scale_color_manual(values = c("steelblue","darkred")) #manually add the colors to the lines   for males/females
 
 ```
+```{r}
+reg4=lm(as.numeric(mental)~year+ex2014+sex,data=brfssdata2)
+summary(reg4)
+```
+```{r}
+regstab=lm(as.numeric(mental)~year+ex2014+sex,data=brfssdata2)
+summary(regstab)
+```
+
+

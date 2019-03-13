@@ -12,5 +12,7 @@
 
 
 In the repo you can find:
-* The final report
+* <a
+href="https://github.com/cazvan/599B_Final/blob/master/index.Rmd">The final report <a/>
+
 * The data used 

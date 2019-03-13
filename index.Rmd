@@ -8,8 +8,11 @@ output:
     df_print: paged
   pdf_document: default
 ---
- 
-```{r, libraries, eval=TRUE, echo=FALSE}
+
+**Data Pre-processing**
+
+First we need call the libraries in order to use the packages
+```{r, libraries, eval=TRUE, warning=FALSE, error=FALSE, message=FALSE}
 # call libraries:
 library(ggplot2)
 library(haven)
@@ -23,13 +26,13 @@ library(reshape2)
 library(Hmisc)
 ```
 
-```{r, loaddata, eval=TRUE}
+```{r, loaddata, eval=FALSE}
 #import data (~250mb)-this chunk imports the original data file that was stored in dropbox:
 # datalink='https://dl.dropboxusercontent.com/s/rpjq0x1bgzgdvh1/BRFSS599B.dta'
 # brfssdata_orig=read_dta(datalink)
 ```
 
-```{r loaddata3, eval=TRUE}
+```{r loaddata3, eval=FALSE}
 # #trim dataframe-because the original data file was 250mb, we need to trim it so it can be uploaded to GitHub. This chunk trims the data file and saves a csv in the working directory:
 # brfssdata=brfssdata_orig%>% # make a new list from the original dataset
 #    select(mental, stab, ex2014,ex2016, year)%>% # select the 5 variables we need for plots
@@ -45,22 +48,24 @@ library(Hmisc)
 # brfssdata = read.csv("brfss.csv") # read back into RStudio if necessary
 ```
 
-```{r loaddata2, eval=TRUE}
-# #trim dataframe-this chunk also trims the original datafile into a smaller file, but saves different variables that are used in the multivariate plot:
-# brfssdata2=brfssdata_orig%>% # create a second list from the original dataset, with different variables
-#    select(mental, stab, ex2014,sex, year)%>% # select the 5 variables we need for plots
-#    filter(!is.na(stab))%>% # filter out n/a responses
-#    filter(!is.na(mental))%>% # filter out n/a responses
-#    filter(!is.na(year))%>% # filter out n/a responses
-#    filter(!is.na(ex2014))%>% # filter out n/a responses
-#    filter(!is.na(sex))%>% # filter out n/a responses
-#    filter((year!=2018)) # filter responses from 2018 (it's a tiny sample and has weird averages)
-# write.csv(brfssdata2,"brfss2.csv",row.names = FALSE) # write the list to csv
-# head(brfssdata2) # look at the column names
-# dim(brfssdata2) # look at the dimensions
-# brfssdata2 = read.csv("brfss2.csv") # 
+Trim dataframe-this chunk also trims the original datafile into a smaller file, but saves different variables that are used in the multivariate plot:
+
+```{r loaddata2, eval=FALSE }
+brfssdata2=brfssdata_orig%>% # create a second list from the original dataset, with different variables
+   select(mental, stab, ex2014,sex, year)%>% # select the 5 variables we need for plots
+   filter(!is.na(stab))%>% # filter out n/a responses
+   filter(!is.na(mental))%>% # filter out n/a responses
+   filter(!is.na(year))%>% # filter out n/a responses
+   filter(!is.na(ex2014))%>% # filter out n/a responses
+   filter(!is.na(sex))%>% # filter out n/a responses
+   filter((year!=2018)) # filter responses from 2018 (it's a tiny sample and has weird averages)
+write.csv(brfssdata2,"brfss2.csv",row.names = FALSE) # write the list to csv
+head(brfssdata2) # look at the column names
+dim(brfssdata2) # look at the dimensions
+brfssdata2 = read.csv("brfss2.csv") #
 ```
 
+Then we need to load the data we are going to use for our analysis
 ```{r}
 # import data (~90mb each)
 #this chunk imports the csv files that the previous two chunks uploaded to Github. Because these files are under 100mb, they were able to be uploaded
@@ -68,16 +73,15 @@ brfssdata=read.csv("https://github.com/cazvan/599B_Final/raw/master/brfss.csv")
 brfssdata2=read.csv("https://github.com/cazvan/599B_Final/raw/master/brfss2.csv")
 ```
 
-
+This chunk removes states that do not fit neatly into the categories we use in our plots. These four states expanded ACA after 2014 ("AK" "LA" "MT" "PA") and are excluded from the results:
 ```{r}
-#This chunk removes states that do not fit neatly into the categories we use in our plots. These four states expanded ACA after 2014 ("AK" "LA" "MT" "PA") and are excluded from the results:
 brfssdata$stab=as.character(brfssdata$stab) #convert stab into numeric
 bad=unique(brfssdata$stab[(brfssdata$ex2014 == 0 & brfssdata$ex2016 == 1)]) #create a list of the bad states
 bad # show us the bad states
 ```
 
+Data prep for visualization: Calculate annual average negative mental days, grouped into expansion and non-expansion states
 ```{r}
-#Data prep for visualization: Calculate annual average negative mental days, grouped into expansion and non-expansion states
 #pipe=%>% (this is from dplyr) 
 dfmelt=brfssdata%>% #use main dataset
   select(year, stab, mental, ex2014)%>% #select these 4 variables for use
@@ -92,8 +96,8 @@ dfmelt=brfssdata%>% #use main dataset
 #View(dfmelt) # view the dataframe to verify results
 ```
 
+Data prep for visualization: Calculate annual average negative mental days, ungrouped (expansion and non-expansion groups together)
 ```{r}
-#Data prep for visualization: Calculate annual average negative mental days, ungrouped (expansion and non-expansion groups together)
 #pipe=%>% (this is from dplyr) 
 dfmelt2=brfssdata%>% #use main dataset
   select(year, stab, mental)%>% #select the 3 variables to be used
@@ -106,9 +110,8 @@ dfmelt2=brfssdata%>% #use main dataset
 #View(dfmelt2)
 ```
 
+Averaging annual negative mental health days by year, sex, and expansion vs. non-expansion state; pipe=%>% (this is from dplyr)
 ```{r}
-#Data prep for multivariate visualization, averaging annual negative mental health days by year, sex, and expansion vs. non-expansion state
-#pipe=%>% (this is from dplyr) 
 dfsex=brfssdata2%>% # name the new frame, use the second list
   select(year, stab, mental, ex2014, sex)%>% #select the variables to be used
   filter(stab %nin% bad)%>% #filter out the bad states
@@ -129,6 +132,7 @@ dfsex$sex <- ordered(dfsex$sex, #order the variable from 1 to 0
 #View(dfsex)
 ```
 
+
 ```{r}
 #Univariate Visualization: barplot
 source1="BRFSS Survey Data 2000-2018" #source
@@ -145,10 +149,10 @@ yearplot=ggplot(data= brfssdata, aes(x=year)) + # create the yearplot object usi
                               axis.text.x = element_text(angle = -30, hjust = 0)) # adjust the x axis labels
 yearplot # display the year plot
 ```
+
 The following line plot shows the overall effect of ACA expansion.  With an average of 3.44 days reported with negative mental health, we've witnessed a significant decrease for negative mental health in year 2002 and year 2014. After the ACA expansion in 2014, there is also a significant increase for negative mental health. 
 
 ```{r}
-#Univariate Visualization: Line Plot NEW YAY
 source1="BRFSS Survey Data 2000-2018" #source
 title1="Average Negative Mental Health Days Over Last 30 Days" #title for the plot
 

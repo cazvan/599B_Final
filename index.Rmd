@@ -1,13 +1,24 @@
----
-title: "How Did ACA Expansion Effect the Mental Health of Americans?"
+<a id='Top'></a>
 
-author: "Caz VanDevere, Hanson Shi, & Ana Chkheidze"
+<br> 
+<center><img src="http://i.imgur.com/sSaOozN.png" width="500"></center>
+
+<p style="text-align: center; font-size: 220%;"><b>
+</b></p>
+_____
+
+## How Did ACA Expansion Effect the Mental Health of Americans?
+
+<p style="font-size: 130%;">
+Caz VanDevere, Hanson Shi, & Ana Chkheidze
+</p>
+
 date: "March 20, 2019"  
 output:
   html_document:
     df_print: paged
   pdf_document: default
----
+_____
 
 **Data Pre-processing**
 
@@ -51,18 +62,18 @@ library(Hmisc)
 Trim dataframe-this chunk also trims the original datafile into a smaller file, but saves different variables that are used in the multivariate plot:
 
 ```{r loaddata2, eval=FALSE }
-brfssdata2=brfssdata_orig%>% # create a second list from the original dataset, with different variables
-   select(mental, stab, ex2014,sex, year)%>% # select the 5 variables we need for plots
-   filter(!is.na(stab))%>% # filter out n/a responses
-   filter(!is.na(mental))%>% # filter out n/a responses
-   filter(!is.na(year))%>% # filter out n/a responses
-   filter(!is.na(ex2014))%>% # filter out n/a responses
-   filter(!is.na(sex))%>% # filter out n/a responses
-   filter((year!=2018)) # filter responses from 2018 (it's a tiny sample and has weird averages)
-write.csv(brfssdata2,"brfss2.csv",row.names = FALSE) # write the list to csv
-head(brfssdata2) # look at the column names
-dim(brfssdata2) # look at the dimensions
-brfssdata2 = read.csv("brfss2.csv") #
+#brfssdata2=brfssdata_orig%>% # create a second list from the original dataset, with different variables
+#   select(mental, stab, ex2014,sex, year)%>% # select the 5 variables we need for plots
+#   filter(!is.na(stab))%>% # filter out n/a responses
+#   filter(!is.na(mental))%>% # filter out n/a responses
+#   filter(!is.na(year))%>% # filter out n/a responses
+#   filter(!is.na(ex2014))%>% # filter out n/a responses
+#   filter(!is.na(sex))%>% # filter out n/a responses
+#   filter((year!=2018)) # filter responses from 2018 (it's a tiny sample and has weird averages)
+#write.csv(brfssdata2,"brfss2.csv",row.names = FALSE) # write the list to csv
+#head(brfssdata2) # look at the column names
+#dim(brfssdata2) # look at the dimensions
+#brfssdata2 = read.csv("brfss2.csv") #
 ```
 
 Then we need to load the data we are going to use for our analysis
@@ -233,13 +244,18 @@ ggplot(dfsex, aes(x=year, y = mentavg, group = sex)) + #create a lineplot using 
   scale_color_manual(values = c("steelblue","darkred")) #manually add the colors to the lines   for males/females
 
 ```
+
 ```{r}
 reg4=lm(as.numeric(mental)~year+ex2014+sex,data=brfssdata2)
 summary(reg4)
 ```
+
 ```{r}
 regstab=lm(as.numeric(mental)~year+ex2014+sex,data=brfssdata2)
 summary(regstab)
 ```
 
+```{r}
+
+```
 

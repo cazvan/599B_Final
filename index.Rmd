@@ -35,6 +35,8 @@ library(magrittr)
 library(dplyr)
 library(reshape2)
 library(Hmisc)
+library(dotwhisker)
+library(broom)
 ```
 
 ```{r, loaddata, eval=FALSE}
@@ -251,11 +253,26 @@ summary(reg4)
 ```
 
 ```{r}
-regstab=lm(as.numeric(mental)~year+ex2014+sex,data=brfssdata2)
+regstab=lm(as.numeric(mental)~year+ex2014+sex+stab,data=brfssdata2)
 summary(regstab)
 ```
 
 ```{r}
+# regression1 = tidy(reg4) %>%
+    # mutate(model = "reg4") 
+# summary(regression1)
+```
+
+
+```{r}
+# regression2=tidy(regstab) %>% mutate(model = "regstab")
+# summary(regression2)
+```
+
+
+```{r}
+bothmodels=rbind(regstab,reg4)
+dwplot(bothmodels)
 
 ```
 

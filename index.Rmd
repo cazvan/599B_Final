@@ -99,10 +99,13 @@ library(reshape2)
 library(Hmisc)
 library(dotwhisker)
 library(broom)
+<<<<<<< HEAD
 library(pscl)
 library(MASS)
 library(boot)
 library(cowplot)
+=======
+>>>>>>> parent of cb70c6f... Update
 ```
 
 This chunk imports the original data file that was stored in dropbox:
@@ -377,6 +380,7 @@ regression4=tidy(reg4) %>%
 summary(reg4)
 ```
 
+<<<<<<< HEAD
 
 We assume that the nature of our outcome variable (mental) requires more complex model than a linear regression. We attempted conducting the Zero-Inflated Negative Binomial regression. We attempted a simple analysis. Due to our lack of familiarity with this model, we had to limit our analysis to these few lines. 
 
@@ -396,6 +400,8 @@ dwplot(zigb1)
 
 **Comparing Models**
 
+=======
+>>>>>>> parent of cb70c6f... Update
 
 ```{r}
 allmodels=rbind(regression1,regression2,regression3,regression4)

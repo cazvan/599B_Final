@@ -1,0 +1,427 @@
+<a id='Top'></a>
+
+<br> 
+<center><img src="http://i.imgur.com/sSaOozN.png" width="500"></center>
+<br>
+
+<p style="text-align: center; font-size: 220%;"><b>
+How Did ACA Expansion Effect the Mental Health of Americans?
+</b></p>
+_____
+
+<br>
+<center><img src="https://github.com/cazvan/599B_Final/blob/master/Team%20Photo.png" width="1000"></center>
+<br>
+
+<p style="font-size: 130%;">
+By <b> <i> Caz VanDevere, Ana Chkheidze, and Hanson Shi</i>
+</p>
+
+Date: "March 20, 2019"  
+_____
+<a id='Contents'></a>
+
+<p style="text-align: left; font-size: 175%;"><b>
+Contents:
+</b></p>
+
+1. [Introduction and Data] (#part1)
+2. [Data Pre-Processing] (#part2)
+3. [What is the survey count by year?] (#part3)
+4. [Is there any difference for states that expanded ACA verse those states that did not expand?] (#part4)
+5. [What are the effects of the ACA expansion on males versus females?] (#part5)
+6. [What are the effects of explanatory variables on average mental health?] (#part6)
+7. [Conclusion of the Analysis] (#part7)
+
+_____
+<a id='part1'></a>
+
+<p style="text-align: center; font-size: 175%;"><b>
+Introduction and Data Summary
+</b></p>
+
+**Introduction**
+
+The Affordable Care Act (ACA or “Obamacare”) was signed into law by President Barack Obama in 2010. A major overhaul of the U.S. health-care system, Obamacare aimed to reduce the amount of uncompensated care the average U.S. family pays for by requiring everyone to have health insurance or pay a tax penalty.
+
+Our analysis tries to find out what were the effects of the ACA expansion or no expansion on the average mental health of Americans.
+
+Our dataset is comprised two sets merged together. The first, Behavioral Risk Factor Surveillance System (BRFSS) surveys from 2000 to 2017 were created by the U.S. Center for Disease Control (CDC) and downloaded from their website: https://www.cdc.gov/brfss/annual_data/annual_data.htm. We used the following variables: 
+
+* mental 
+* stab 
+* ex2014
+* ex2016
+* sex
+* year
+
+The outcome variable that concerns this report is labeled 'mental.' On each survey, respondants were asked how many days out of the last 30 they felt negative mental health effects, including anxiety, depression, or stress. Though this variable is subjective, this report uses it as a stand-in to capture numerically the general mental health states of those surveyed.
+
+The variable labeled stab refers to state name abbreviations. The variable ex2014 is a binary variable for whether or not a state expanded under the Affordable Care Act in 2014; similarly, ex2016 is a binary variable for whether or not a state expanded under the Affordable Care Act in 2016. Sex captures the biological sex of the respondant, and year captures the year of the survey.
+
+The second dataset was a handmade dataset dataset consisteing of each state in the U.S. and the year the state expanded under the Affordable Care Act. The first task was to import the whole dataset (~250mb), then remove the unused variables. We then saved the variables we needed into two smaller datasets, both under 100mb, so that we could upload them to GitHub.
+
+<br>
+**Research Question**
+
+<p style="text-align: left; font-size: 130%;"><b>
+Are there any differences in terms of mental health between the states that expanded ACA and those that did not? If so, what are the effects of the expansion/no expansion on the individuals? (males vs females)
+</b></p>
+
+<br>
+[Go back to the table of contents](#Contents)
+<br
+
+_____
+<a id='part2'></a>
+
+<p style="text-align: center; font-size: 175%;"><b>
+Data Pre-processing
+</b></p>
+
+First we need call the libraries in order to use the packages
+
+```{r,libraries, eval=TRUE, warning=FALSE, error=FALSE, message=FALSE}
+library(ggplot2)
+library(haven)
+library(Rmisc)
+library(ggpubr)
+library(tibble)
+library(ggrepel)
+library(magrittr)
+library(dplyr)
+library(reshape2)
+library(Hmisc)
+library(dotwhisker)
+library(broom)
+library(pscl)
+library(MASS)
+library(boot)
+library(cowplot)
+```
+
+This chunk imports the original data file that was stored in dropbox:
+
+```{r, loaddata, eval=FALSE}
+# datalink='https://dl.dropboxusercontent.com/s/rpjq0x1bgzgdvh1/BRFSS599B.dta'
+# brfssdata_orig=read_dta(datalink)
+```
+
+The chunk below trims unused variables from the dataframe. Because the original data file was 250mb, we need to trim it so it can be uploaded to GitHub. This chunk trims the data file and saves a csv in the working directory:
+
+```{r loaddata3, eval=FALSE}
+# brfssdata=brfssdata_orig%>% # make a new list from the original dataset
+#    select(mental, stab, ex2014,ex2016, year)%>% # select the 5 variables we need for plots
+#    filter(!is.na(stab))%>% # filter out n/a responses
+#    filter(!is.na(mental))%>% # filter out n/a responses
+#    filter(!is.na(year))%>% # filter out n/a responses
+#    filter(!is.na(ex2014))%>% # filter out n/a responses
+#    filter(!is.na(ex2016))%>% # filter out n/a responses
+#    filter((year!=2018)) # filter responses from 2018 (it's a tiny sample and has weird averages)
+# write.csv(brfssdata,"brfss.csv",row.names = FALSE) # write the list into a csv
+# head(brfssdata) # look at the column names
+# dim(brfssdata) # look at the dimensions
+# brfssdata = read.csv("brfss.csv") # read back into RStudio if necessary
+```
+
+This chunk also trims the original datafile into a smaller file, but saves different variables that are used in the multivariate plot:
+
+```{r loaddata2, eval=FALSE }
+# brfssdata2=brfssdata_orig%>% # create a second list from the original dataset, with different variables
+#    select(mental, stab, ex2014,sex, year)%>% # select the 5 variables we need for plots
+#    filter(!is.na(stab))%>% # filter out n/a responses
+#    filter(!is.na(mental))%>% # filter out n/a responses
+#    filter(!is.na(year))%>% # filter out n/a responses
+#    filter(!is.na(ex2014))%>% # filter out n/a responses
+#    filter(!is.na(sex))%>% # filter out n/a responses
+#    filter((year!=2018)) # filter responses from 2018 (it's a tiny sample and has weird averages)
+# write.csv(brfssdata2,"brfss2.csv",row.names = FALSE) # write the list to csv
+# head(brfssdata2) # look at the column names
+# dim(brfssdata2) # look at the dimensions
+# brfssdata2 = read.csv("brfss2.csv") #
+```
+
+Then we need to load the data we are going to use for our analysis by importing the datasets we just made (~90mb each). This chunk imports the csv files that the previous two chunks uploaded to Github. Because these files are under 100mb, they were able to be uploaded:
+
+```{r}
+brfssdata=read.csv("https://github.com/cazvan/599B_Final/raw/master/brfss.csv")
+brfssdata2=read.csv("https://github.com/cazvan/599B_Final/raw/master/brfss2.csv")
+```
+
+This chunk removes states that do not fit neatly into the categories we use in our plots. These four states expanded ACA after 2014 ("AK" "LA" "MT" "PA") and are excluded from the results:
+```{r}
+brfssdata$stab=as.character(brfssdata$stab) #convert stab into numeric
+bad=unique(brfssdata$stab[(brfssdata$ex2014 == 0 & brfssdata$ex2016 == 1)]) #create a list of the bad states
+bad # show us the bad states
+```
+
+Data prep for visualization: Calculate annual average negative mental days, grouped into expansion and non-expansion states
+```{r}
+#pipe=%>% (this is from dplyr) 
+dfmelt=brfssdata%>% #use main dataset
+  select(year, stab, mental, ex2014)%>% #select these 4 variables for use
+  filter(stab %nin% bad)%>% # filter out bad states
+  filter(!is.na(ex2014))%>% #filter out n/a responses for ex2014 variable
+  group_by(year,ex2014)%>% # group responeses by year then ex2014
+  mutate(mentavg=mean(mental, na.rm = TRUE))%>% #create a new variable that is the average number of negative mental health days for each group created above
+  ungroup()%>% # ungroup the groups
+  select(year, ex2014,mentavg)%>% #select the year, ex2014, and newly created mentavg variables
+  unique()%>% #only look at unique responses
+  mutate(ex2014=ifelse(ex2014==0, "No Expansion", "Expansion")) #change the binary reponses to string responses
+#View(dfmelt) # view the dataframe to verify results
+```
+
+Data prep for visualization: Calculate annual average negative mental days, ungrouped (expansion and non-expansion groups together)
+```{r}
+#pipe=%>% (this is from dplyr) 
+dfmelt2=brfssdata%>% #use main dataset
+  select(year, stab, mental)%>% #select the 3 variables to be used
+  filter(stab %nin% bad)%>% # filter out the bad states
+  group_by(year)%>% # group by year
+  mutate(mentavg2=mean(mental, na.rm = TRUE))%>% # make a new variable for average negative mental days per year
+  ungroup()%>% # ungroup
+  select(year,mentavg2)%>% # select year and mentavg variables
+  unique() # only look at unique responses
+#View(dfmelt2)
+```
+
+Averaging annual negative mental health days by year, sex, and expansion vs. non-expansion state; pipe=%>% (this is from dplyr)
+```{r}
+dfsex=brfssdata2%>% # name the new frame, use the second list
+  select(year, stab, mental, ex2014, sex)%>% #select the variables to be used
+  filter(stab %nin% bad)%>% #filter out the bad states
+  filter(!is.na(ex2014))%>% #filter out n/a answers from ex2014
+  group_by(sex,year,ex2014)%>% #group by sec, year, and ex2014 variables
+  mutate(mentavg=mean(mental, na.rm = TRUE))%>% #create a new variable for average mental days by sex,year, and expansion group
+  ungroup()%>% #ungroup the grouped variables
+  select(year, ex2014,mentavg,sex)%>% #select the 4 variables to be used
+  unique()%>% #group into unique answers
+  mutate(ex2014=ifelse(ex2014==0, "No ACA Expansion", "ACA Expansion"))%>% #rename expansion variable
+  filter((year!=2018)) #remove responses from 2018
+
+#rename the binary sex variable to "male" and "female"
+dfsex$sex <- ordered(dfsex$sex, #order the variable from 1 to 0
+  levels = c(1,0), #select the binary numbers
+  labels = c("Males", "Females")) # choose the new names
+
+#View(dfsex)
+```
+
+<br>
+[Go back to the table of contents](#Contents)
+<br>
+_____
+<a id='part3'></a>
+
+<p style="text-align: center; font-size: 175%;"><b>
+What is the survey count by year? 
+</b></p>
+
+We start our analysis by looking at the overall number of surveys over the year 2000-2018. This provides more information on the size and depth of our data for conducting analysis.  
+```{r}
+#Univariate Visualization: barplot
+source1="BRFSS Survey Data 2000-2018" #source
+titlecount="Survey Count by Year" #title for the plot
+
+yearplot=ggplot(data= brfssdata, aes(x=year)) + # create the yearplot object using the main dataset
+  geom_bar(stat = "count", fill="steelblue") + # make the yearplot into a barplot, color it
+  labs(title=titlecount, x=NULL, y=NULL,caption=source1) + # use the labels created above
+  scale_y_continuous(labels = scales::comma) + # set the scale for the y axis
+  scale_x_continuous(breaks=c(2000:2017)) + # set the scale for the years on the x axis
+  theme(panel.background = element_rect(fill = "white",colour = "grey50"), # choose background colors
+                              plot.caption = element_text(hjust = 0), # default was 1 #set caption position 
+                              plot.title = element_text(hjust = 0.5), # set title position
+                              axis.text.x = element_text(angle = -30, hjust = 0)) # adjust the x axis labels
+yearplot # display the year plot
+```
+
+The following line plot shows the overall effect of ACA expansion.  With an average of 3.44 days reported with negative mental health, we've witnessed a significant decrease for negative mental health in year 2002 and year 2014. After the ACA expansion in 2014, there is also a significant increase for negative mental health. 
+
+```{r}
+source1="BRFSS Survey Data 2000-2018" #source
+title1="Average Negative Mental Health Days Over Last 30 Days" #title for the plot
+
+ggplot(dfmelt2,aes(x=year, y = mentavg2)) + #create the lineplot using the new dataset
+  labs(title=title1, x="Year", y="Days",caption=source1) + # use the labels created above
+  geom_line(color="steelblue",aes(), show.legend = TRUE) + # color the line
+  scale_x_continuous(breaks=c(2000:2017)) + #showing the exact year changes from 2000 to 2017 on x axis
+  theme(panel.background = element_rect(fill = "white",colour = "grey50"), # add plot theme and background colors
+                              plot.caption = element_text(hjust = 0), # default was 1, set caption position
+                              plot.title = element_text(hjust = 0.5), # set title position
+                              axis.text.x = element_text(angle = 30, hjust = 1)) + # adjust the x axis labels
+  geom_hline(yintercept = mean(dfmelt2$mentavg2), # add horizontal average line
+                           linetype="dashed", # make a dashed line 
+                           size=1, # change the line thickness
+                           alpha=0.5)+ # change the line depth
+  geom_vline(xintercept=2014,size=1, alpha=0.5) + # add the vertical Expansion line on year 2014
+   theme(legend.title = element_blank())+ # get rid of legend title
+  annotate("text",x=2017,y=3.455,label="mean",size=3,alpha=0.7) # position the label 
+                          
+```
+
+_____
+<a id='part4'></a>
+
+<p style="text-align: center; font-size: 175%;"><b>
+Is there any difference for states that expanded ACA verse those states that did not expand?
+</b></p>
+
+The next plot shows that people living in the states that expanded ACA experienced more negative mental health than those living in the states that didn't expand ACA. However, after year 2014, there is a more significant increase for states that did not expand ACA.
+
+```{r}
+# Bi-variate Visualization: Line plot
+## this plot shows the average mental health number reported each year for states that expanded ACA vs. states that didnt expand ACA.
+titlebi="Average Negative Mental Health Days Over Last 30 Days" # source
+source1="BRFSS Survey Data 2000-2018" # title for the plot
+ggplot(dfmelt, aes(x=year, y = mentavg, group = ex2014)) + # create the line plot using the new dataset
+  labs(title=titlebi, x="Years", y="Average Mental Health Days",caption=source1) + # use the labels create above
+  geom_line(aes(color=ex2014)) + # add the lines for each catagory 
+  geom_vline(xintercept=2014,size=1, alpha=0.5) + # add the vertical Expansion line on year 2014
+  scale_x_continuous(breaks=c(2000:2017)) + # change the x axis breaks to show each year from 2000 to 2017
+  theme(panel.background = element_rect(fill = "white",colour = "grey50"), # change the background color
+                              plot.caption = element_text(hjust = 0), # default was 1, set caption position
+                              plot.title = element_text(hjust = 0.5), # set title position
+                              axis.text.x = element_text(angle = 30, hjust = 1))+ # adjust the x axis labels
+    geom_hline(yintercept = mean(dfmelt2$mentavg2), # add horizontal average line
+                           linetype="dashed", # make a dashed line
+                           size=1, # change the line thickness 
+                           alpha=0.5)+ # change line depth
+  theme(legend.title = element_blank())+ # get rid of the legend title
+annotate("text",x=2017,y=3.455,label="mean",size=3,alpha=0.7)+ # position the mean label
+annotate("text",x=2015.59,y=3.28,label="ACA Expansion",size=3,alpha=0.7)+ # position the ACA Expension label
+ scale_color_manual(values = c("steelblue","darkred")) # manually change the line colors
+  #scale_y_continuous(expand = 
+  #facet_grid(ex2014~.) #gender? Income bracket?
+
+#add mean behavior line? Add annotation instead of reference line for 2014?
+```
+
+_____
+<a id='part5'></a>
+
+<p style="text-align: center; font-size: 175%;"><b>
+What are the effects of the ACA expansion on males versus females?
+</b></p>
+
+We broke the analysis further down to examine the effects of ACA expansion on male and female respondents. Evidently, ACA expansion had similar effects on both groups in ACA and non-ACA states, i.e. both groups experienced deteriorating mental health from that point onward. Moreover, the analysis shows an interesting result: on average, female respondents experienced more negative mental health days compared to their male counterparts for 18 years. 
+```{r multivar, eval=TRUE}
+# Multi-variate Visualization: line plot for sex, income, and education level:
+## this plot shows the average mental health number reported each year for 
+## states that expanded ACA vs. states that didnt expand ACA
+titlesex="Negative Mental Health Days by Sex by Expansion Group" #give a title to the graph
+
+ggplot(dfsex, aes(x=year, y = mentavg, group = sex)) + #create a lineplot using dfsex frame 
+  geom_line(aes(color=sex)) + # add a line to mark average mental days for 2 groups
+  geom_vline(xintercept=2014) + #add a vertical line to mark expansion year
+  scale_x_continuous(breaks=c(2000:2017)) + #include years 2000-2017
+  scale_y_continuous(breaks=c(1,1.2,1.4,1.6,1.8,2,2.2,2.4,2.6,2.8,3,3.2,3.4,3.6,3.8,4,4.2)) +
+  #adjusting the y axis scale
+  labs(title=titlesex, x="Year", y="Days",caption=source1) + #give labels to the axis and     adding source
+  theme(panel.background = element_rect(fill = "white",colour = "grey50"), #change background                               color
+                              plot.caption = element_text(hjust = 0),# adjust caption position
+                              plot.title = element_text(hjust = 0.5), # adjust title position
+                              axis.text.x = element_text(angle = 30, hjust = 1)) + #adjust x                                axis to have an angle
+  facet_grid(ex2014~.) + #create two graphs according to ex2014
+  geom_hline(yintercept = mean(dfmelt2$mentavg2), #dd a horizontal line for the total mean
+                           linetype="dashed", #type of line
+                           size=1, #thickness
+                           alpha=0.5)+ #transparency
+  theme(legend.title = element_blank())+ #get rid of the legend title
+  annotate("text",x=2017,y=3.55,label="mean",size=3,alpha=0.7)+ #position text 'mean'
+  annotate("text",x=2012.5,y=2.25,label="ACA Expansion",size=3,alpha=0.7)+ #position text 'ACA   Expansion'
+  scale_color_manual(values = c("steelblue","darkred")) #manually add the colors to the lines   for males/females
+
+```
+
+<br>
+[Go back to the table of contents](#Contents)
+<br>
+_____
+<a id='part6'></a>
+
+<p style="text-align: center; font-size: 175%;"><b>
+What are the effects of explanatory variables on average mental health?
+</b></p>
+
+Explanation
+
+**Regression Analysis-Logit Model**
+
+
+```{r}
+#starting with a simple model, adding independent variables and tidying along the way
+
+#1
+reg1=lm(as.numeric(mental)~year,data=brfssdata2) 
+regression1 = tidy(reg1) %>%
+    mutate(model = "Model 1") 
+#2
+reg2=lm(as.numeric(mental)~year+ex2014,data=brfssdata2)
+regression2=tidy(reg2) %>% 
+    mutate(model = "Model 2")
+#3
+reg3=lm(as.numeric(mental)~year+ex2014+sex,data=brfssdata2)
+regression3=tidy(reg3) %>% 
+    mutate(model = "Model 3")
+#4
+reg4=lm(as.numeric(mental)~year+ex2014+sex+job,data=brfssdata2)
+regression4=tidy(reg4) %>% 
+    mutate(model = "Model 4")
+
+#let's see the results
+summary(reg4)
+```
+
+
+We assume that the nature of our outcome variable (mental) requires more complex model than a linear regression. We attempted conducting the Zero-Inflated Negative Binomial regression. We attempted a simple analysis. Due to our lack of familiarity with this model, we had to limit our analysis to these few lines. 
+
+```{r}
+zigb <- zeroinfl(mental ~ year + ex2014 + sex, data = brfssdata2)
+summary(zigb)
+```
+
+```{r}
+zigb1 = tidy(zigb) %>%
+    mutate(model = "zigb1") 
+```
+
+```{r}
+dwplot(zigb1)
+```
+
+**Comparing Models**
+
+
+```{r}
+allmodels=rbind(regression1,regression2,regression3,regression4)
+dwplot(allmodels, vline = geom_vline(xintercept = 0, colour = "grey50", linetype = 2,alpha=0.6)) + 
+  xlab("Coefficient Estimates") + 
+  ylab("") +
+  ggtitle("Estimation of Coefficents for All Models") +
+  theme(axis.text.y = element_text(size=10, angle = 0),
+        axis.text.x = element_text(size=10),
+        plot.title = element_text(size = 12, hjust = 0.5),
+        plot.caption = element_text(hjust = 1, vjust = -1.2),
+        axis.title.y = element_text(size = 11, hjust = 0.5, vjust = 1.75),
+        axis.title.x = element_text(size = 11, hjust = 0.5, vjust = -1.25)+
+
+```
+_____
+<a id='part7'></a>
+
+<p style="text-align: center; font-size: 175%;"><b>
+Conclusion of the Analysis
+</b></p>
+
+TEXT HERE TEXT HERE
+
+
+
+<br>
+
+[Go back to top of the page](#Top)
+
+[Go back to the table of contents](#Contents)
+
+[Go to the Project Repo](https://github.com/cazvan/599B_Final)
+

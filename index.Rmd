@@ -37,6 +37,9 @@ library(reshape2)
 library(Hmisc)
 library(dotwhisker)
 library(broom)
+library(pscl)
+library(MASS)
+library(boot)
 ```
 
 Our dataset is comprised two sets merged together. The first, Behavioral Risk Factor Surveillance System (BRFSS) surveys from 2000 to 2017 were created by the U.S. Center for Disease Control (CDC) and downloaded from their website: https://www.cdc.gov/brfss/annual_data/annual_data.htm. We used the following variables: mental, stab, ex2014, ex2016 sex, and year. 
@@ -277,6 +280,21 @@ reg1=glm(as.numeric(mental_bi)~year,data=brfssdata2,family="binomial") #starting
 regression1 = tidy(reg1) %>%
     mutate(model = "reg1") 
 ```
+
+```{r}
+zigb <- zeroinfl(mental ~ year + ex2014 + sex, data = brfssdata2)
+summary(zigb)
+```
+
+```{r}
+zigb1 = tidy(zigb) %>%
+    mutate(model = "zigb1") 
+```
+
+```{r}
+dwplot(zigb1)
+```
+
 
 
 ```{r}

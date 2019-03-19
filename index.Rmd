@@ -1,27 +1,3 @@
-<<<<<<< HEAD
-<a id='Top'></a>
-
-<br> 
-<center><img src="http://i.imgur.com/sSaOozN.png" width="500"></center>
-<br>
-
-<p style="text-align: center; font-size: 220%;"><b>
-How Did ACA Expansion Effect the Mental Health of Americans?
-</b></p>
-_____
-
-<br>
-<center><img src="https://github.com/cazvan/599B_Final/blob/master/Team%20Photo.png" width="1000"></center>
-<br>
-
-<p style="font-size: 130%;">
-By <b> <i> Caz VanDevere, Ana Chkheidze, and Hanson Shi</i>
-</p>
-
-Date: "March 20, 2019"  
-_____
-<a id='Contents'></a>
-=======
 ---
 title: "How Did ACA Expansion Effect the Mental Health of Americans?"
 
@@ -32,8 +8,6 @@ output:
     df_print: paged
   pdf_document: default
 ---
->>>>>>> parent of de6bd34... Ana-Update
-
 <p style="text-align: left; font-size: 175%;"><b>
 Contents:
 </b></p>

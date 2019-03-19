@@ -23,7 +23,7 @@ _____
 **Data Pre-processing**
 
 First we need call the libraries in order to use the packages
-```{r, libraries, eval=TRUE, warning=FALSE, error=FALSE, message=FALSE}
+```{r, libraries, eval=TRUE, warning=FALSE, error=FALSE, message=FALSE}, 
 # call libraries:
 library(ggplot2)
 library(haven)

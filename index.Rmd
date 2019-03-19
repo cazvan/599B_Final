@@ -39,7 +39,7 @@ library(dotwhisker)
 library(broom)
 ```
 
-Our dataset is comprised twonsets merged together. The first, Behavioral Risk Factor Surveillance System (BRFSS) surveys from 2000 to 2017 were created by the U.S. Center for Disease Control (CDC) and downloaded from their website: https://www.cdc.gov/brfss/annual_data/annual_data.htm. We used the following variables: mental, stab, ex2014, ex2016 sex, and year. 
+Our dataset is comprised two sets merged together. The first, Behavioral Risk Factor Surveillance System (BRFSS) surveys from 2000 to 2017 were created by the U.S. Center for Disease Control (CDC) and downloaded from their website: https://www.cdc.gov/brfss/annual_data/annual_data.htm. We used the following variables: mental, stab, ex2014, ex2016 sex, and year. 
 
 The outcome variable that concerns this report is labeled 'mental.' On each survey, respondants were asked how many days out of the last 30 they felt negative mental health effects, including anxiety, depression, or stress. Though this variable is subjective, this report uses it as a stand-in to capture numerically the general mental health states of those surveyed.
 
@@ -256,32 +256,108 @@ ggplot(dfsex, aes(x=year, y = mentavg, group = sex)) + #create a lineplot using 
 
 ```
 
+_____
+<a id='part5'></a>
+
+<p style="text-align: center; font-size: 175%;"><b>
+What are the effects of explanatory variables on average mental health?
+</b></p>
+
+Explanation
+
+**Regression Analysis-Logit Model**
+
 ```{r}
-reg4=lm(as.numeric(mental)~year+ex2014+sex,data=brfssdata2)
+cut=median(brfssdata2$mental)
+brfssdata2$mental_bi=ifelse(brfssdata2$mental>cut,                        1,0)
+```
+
+```{r}
+reg1=glm(as.numeric(mental_bi)~year,data=brfssdata2,family="binomial") #starting with a simple model, adding elements and tidying
+regression1 = tidy(reg1) %>%
+    mutate(model = "reg1") 
+```
+
+
+```{r}
+dwplot(regression1)
+```
+
+
+
+```{r}
+reg2=glm(as.numeric(mental_bi)~year+ex2014,data=brfssdata2, family="binomial")
+regression2=tidy(reg2) %>% 
+    mutate(model = "reg2")
+```
+
+```{r}
+dwplot(regression2)
+```
+
+
+```{r}
+reg3=glm(as.numeric(mental_bi)~year+ex2014+sex,data=brfssdata2, family="binomial")
+regression3=tidy(reg3) %>% 
+    mutate(model = "reg3")
+```
+
+```{r}
+dwplot(regression3)
+```
+
+
+
+```{r}
+reg4=glm(as.numeric(mental_bi)~year+ex2014+sex+job,data=brfssdata2, family="binomial")
+
+regression4=tidy(reg4) %>% 
+    mutate(model = "reg4")
 summary(reg4)
 ```
 
+
+**Comparing Models**
 ```{r}
-regstab=lm(as.numeric(mental)~year+ex2014+sex+stab,data=brfssdata2)
-summary(regstab)
+allmodels=rbind(regression1,regression2,regression3,regression4)
+dwplot(allmodels)
 ```
 
-```{r}
-# regression1 = tidy(reg4) %>%
-    # mutate(model = "reg4") 
-# summary(regression1)
+Another important regression model is the **logistic regression**. In this case, the dependent variable is a binary value.
+
+For this example, I will turn our previous dependent variable into a dichotomous one:
+```{r, eval=FALSE}
+cut=median(safe2$PERSONAL)
+safe2$PERSONAL_bi=ifelse(safe2$PERSONAL>cut,
+                         1,0)
 ```
 
 
-```{r}
-# regression2=tidy(regstab) %>% mutate(model = "regstab")
-# summary(regression2)
+Now, let me compute the regression:
+
+```{r, eval=FALSE}
+logit_PERSONAL = glm(PERSONAL_bi~ .,
+                          data = safe2[,-c(1,5)],
+                          family = "binomial")
+summary(logit_PERSONAL)
 ```
 
+_____
+<a id='part6'></a>
 
-```{r}
-bothmodels=rbind(regstab,reg4)
-dwplot(bothmodels)
+<p style="text-align: center; font-size: 175%;"><b>
+Findings & Conclusion
+</b></p>
 
-```
+**Conclusion of the Analysis**
+
+
+
+<br>
+
+[Go back to top of the page](#Top)
+
+[Go back to the table of contents](#Contents)
+
+[Go to the Project Repo](https://github.com/cazvan/599B_Final)
 

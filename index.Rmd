@@ -80,8 +80,13 @@ Data Pre-processing
 </b></p>
 
 First we need call the libraries in order to use the packages
+<<<<<<< HEAD
 
 ```{r,libraries, eval=TRUE, warning=FALSE, error=FALSE, message=FALSE}
+=======
+```{r, libraries, eval=TRUE, warning=FALSE, error=FALSE, message=FALSE}
+# call libraries:
+>>>>>>> parent of 5752783... Update
 library(ggplot2)
 library(haven)
 library(Rmisc)

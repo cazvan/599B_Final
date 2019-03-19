@@ -13,7 +13,7 @@
 
 In the repo you can find:
 * <a
-href=">The final report <a/>
+href="https://cazvan.github.io/599B_Final/">The final report <a/>
 
 * The data used: 
   * <a

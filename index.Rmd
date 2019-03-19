@@ -2,29 +2,86 @@
 
 <br> 
 <center><img src="http://i.imgur.com/sSaOozN.png" width="500"></center>
+<br>
 
 <p style="text-align: center; font-size: 220%;"><b>
+How Did ACA Expansion Effect the Mental Health of Americans?
 </b></p>
 _____
 
-## How Did ACA Expansion Effect the Mental Health of Americans?
+<br>
+<center><img src="https://github.com/cazvan/599B_Final/blob/master/Team%20Photo.png" width="1000"></center>
+<br>
 
 <p style="font-size: 130%;">
-Caz VanDevere, Hanson Shi, & Ana Chkheidze
+By <b> <i> Caz VanDevere, Ana Chkheidze, and Hanson Shi</i>
 </p>
 
-date: "March 20, 2019"  
-output:
-  html_document:
-    df_print: paged
-  pdf_document: default
+Date: "March 20, 2019"  
 _____
+<a id='Contents'></a>
 
-**Data Pre-processing**
+<p style="text-align: left; font-size: 175%;"><b>
+Contents:
+</b></p>
+
+1. [Introduction and Data] (#part1)
+2. [Data Pre-Processing] (#part2)
+3. [What is the survey count by year?] (#part3)
+4. [Is there any difference for states that expanded ACA verse those states that did not expand?] (#part4)
+5. [What are the effects of the ACA expansion on males versus females?] (#part5)
+6. [What are the effects of explanatory variables on average mental health?] (#part6)
+7. [Conclusion of the Analysis] (#part7)
+
+_____
+<a id='part1'></a>
+
+<p style="text-align: center; font-size: 175%;"><b>
+Introduction and Data Summary
+</b></p>
+
+**Introduction**
+
+The Affordable Care Act (ACA or “Obamacare”) was signed into law by President Barack Obama in 2010. A major overhaul of the U.S. health-care system, Obamacare aimed to reduce the amount of uncompensated care the average U.S. family pays for by requiring everyone to have health insurance or pay a tax penalty.
+
+Our analysis tries to find out what were the effects of the ACA expansion or no expansion on the average mental health of Americans.
+
+Our dataset is comprised two sets merged together. The first, Behavioral Risk Factor Surveillance System (BRFSS) surveys from 2000 to 2017 were created by the U.S. Center for Disease Control (CDC) and downloaded from their website: https://www.cdc.gov/brfss/annual_data/annual_data.htm. We used the following variables: 
+
+* mental 
+* stab 
+* ex2014
+* ex2016
+* sex
+* year
+
+The outcome variable that concerns this report is labeled 'mental.' On each survey, respondants were asked how many days out of the last 30 they felt negative mental health effects, including anxiety, depression, or stress. Though this variable is subjective, this report uses it as a stand-in to capture numerically the general mental health states of those surveyed.
+
+The variable labeled stab refers to state name abbreviations. The variable ex2014 is a binary variable for whether or not a state expanded under the Affordable Care Act in 2014; similarly, ex2016 is a binary variable for whether or not a state expanded under the Affordable Care Act in 2016. Sex captures the biological sex of the respondant, and year captures the year of the survey.
+
+The second dataset was a handmade dataset dataset consisteing of each state in the U.S. and the year the state expanded under the Affordable Care Act. The first task was to import the whole dataset (~250mb), then remove the unused variables. We then saved the variables we needed into two smaller datasets, both under 100mb, so that we could upload them to GitHub.
+
+<br>
+**Research Question**
+
+<p style="text-align: left; font-size: 130%;"><b>
+Are there any differences in terms of mental health between the states that expanded ACA and those that did not? If so, what are the effects of the expansion/no expansion on the individuals? (males vs females)
+</b></p>
+
+<br>
+[Go back to the table of contents](#Contents)
+<br
+
+_____
+<a id='part2'></a>
+
+<p style="text-align: center; font-size: 175%;"><b>
+Data Pre-processing
+</b></p>
 
 First we need call the libraries in order to use the packages
-```{r, libraries, eval=TRUE, warning=FALSE, error=FALSE, message=FALSE}, 
-# call libraries:
+
+```{r,libraries, eval=TRUE, warning=FALSE, error=FALSE, message=FALSE}
 library(ggplot2)
 library(haven)
 library(Rmisc)
@@ -40,15 +97,8 @@ library(broom)
 library(pscl)
 library(MASS)
 library(boot)
+library(cowplot)
 ```
-
-Our dataset is comprised two sets merged together. The first, Behavioral Risk Factor Surveillance System (BRFSS) surveys from 2000 to 2017 were created by the U.S. Center for Disease Control (CDC) and downloaded from their website: https://www.cdc.gov/brfss/annual_data/annual_data.htm. We used the following variables: mental, stab, ex2014, ex2016 sex, and year. 
-
-The outcome variable that concerns this report is labeled 'mental.' On each survey, respondants were asked how many days out of the last 30 they felt negative mental health effects, including anxiety, depression, or stress. Though this variable is subjective, this report uses it as a stand-in to capture numerically the general mental health states of those surveyed.
-
-The variable labeled stab refers to state name abbreviations. The variable ex2014 is a binary variable for whether or not a state expanded under the Affordable Care Act in 2014; similarly, ex2016 is a binary variable for whether or not a state expanded under the Affordable Care Act in 2016. Sex captures the biological sex of the respondant, and year captures the year of the survey.
-
-The second dataset was a handmade dataset dataset consisteing of each state in the U.S. and the year the state expanded under the Affordable Care Act. The first task was to import the whole dataset (~250mb), then remove the unused variables. We then saved the variables we needed into two smaller datasets, both under 100mb, so that we could upload them to GitHub.
 
 This chunk imports the original data file that was stored in dropbox:
 
@@ -157,7 +207,17 @@ dfsex$sex <- ordered(dfsex$sex, #order the variable from 1 to 0
 #View(dfsex)
 ```
 
+<br>
+[Go back to the table of contents](#Contents)
+<br>
+_____
+<a id='part3'></a>
 
+<p style="text-align: center; font-size: 175%;"><b>
+What is the survey count by year? 
+</b></p>
+
+We start our analysis by looking at the overall number of surveys over the year 2000-2018. This provides more information on the size and depth of our data for conducting analysis.  
 ```{r}
 #Univariate Visualization: barplot
 source1="BRFSS Survey Data 2000-2018" #source
@@ -199,7 +259,14 @@ ggplot(dfmelt2,aes(x=year, y = mentavg2)) + #create the lineplot using the new d
                           
 ```
 
-The next question we ask is that is there any difference for states that expanded ACA verse those states that did not expand? The next plot shows that people living in the states that expanded ACA experienced more negative mental health than those living in the states that didn't expand ACA. However, after year 2014, there is a more significant increase for states that did not expand ACA.
+_____
+<a id='part4'></a>
+
+<p style="text-align: center; font-size: 175%;"><b>
+Is there any difference for states that expanded ACA verse those states that did not expand?
+</b></p>
+
+The next plot shows that people living in the states that expanded ACA experienced more negative mental health than those living in the states that didn't expand ACA. However, after year 2014, there is a more significant increase for states that did not expand ACA.
 
 ```{r}
 # Bi-variate Visualization: Line plot
@@ -228,6 +295,13 @@ annotate("text",x=2015.59,y=3.28,label="ACA Expansion",size=3,alpha=0.7)+ # posi
 
 #add mean behavior line? Add annotation instead of reference line for 2014?
 ```
+
+_____
+<a id='part5'></a>
+
+<p style="text-align: center; font-size: 175%;"><b>
+What are the effects of the ACA expansion on males versus females?
+</b></p>
 
 We broke the analysis further down to examine the effects of ACA expansion on male and female respondents. Evidently, ACA expansion had similar effects on both groups in ACA and non-ACA states, i.e. both groups experienced deteriorating mental health from that point onward. Moreover, the analysis shows an interesting result: on average, female respondents experienced more negative mental health days compared to their male counterparts for 18 years. 
 ```{r multivar, eval=TRUE}
@@ -259,8 +333,11 @@ ggplot(dfsex, aes(x=year, y = mentavg, group = sex)) + #create a lineplot using 
 
 ```
 
+<br>
+[Go back to the table of contents](#Contents)
+<br>
 _____
-<a id='part5'></a>
+<a id='part6'></a>
 
 <p style="text-align: center; font-size: 175%;"><b>
 What are the effects of explanatory variables on average mental health?
@@ -270,16 +347,33 @@ Explanation
 
 **Regression Analysis-Logit Model**
 
-```{r}
-cut=median(brfssdata2$mental)
-brfssdata2$mental_bi=ifelse(brfssdata2$mental>cut,                        1,0)
-```
 
 ```{r}
-reg1=glm(as.numeric(mental_bi)~year,data=brfssdata2,family="binomial") #starting with a simple model, adding elements and tidying
+#starting with a simple model, adding independent variables and tidying along the way
+
+#1
+reg1=lm(as.numeric(mental)~year,data=brfssdata2) 
 regression1 = tidy(reg1) %>%
-    mutate(model = "reg1") 
+    mutate(model = "Model 1") 
+#2
+reg2=lm(as.numeric(mental)~year+ex2014,data=brfssdata2)
+regression2=tidy(reg2) %>% 
+    mutate(model = "Model 2")
+#3
+reg3=lm(as.numeric(mental)~year+ex2014+sex,data=brfssdata2)
+regression3=tidy(reg3) %>% 
+    mutate(model = "Model 3")
+#4
+reg4=lm(as.numeric(mental)~year+ex2014+sex+job,data=brfssdata2)
+regression4=tidy(reg4) %>% 
+    mutate(model = "Model 4")
+
+#let's see the results
+summary(reg4)
 ```
+
+
+We assume that the nature of our outcome variable (mental) requires more complex model than a linear regression. We attempted conducting the Zero-Inflated Negative Binomial regression. We attempted a simple analysis. Due to our lack of familiarity with this model, we had to limit our analysis to these few lines. 
 
 ```{r}
 zigb <- zeroinfl(mental ~ year + ex2014 + sex, data = brfssdata2)
@@ -295,79 +389,31 @@ zigb1 = tidy(zigb) %>%
 dwplot(zigb1)
 ```
 
-
-
-```{r}
-dwplot(regression1)
-```
-
-
-
-```{r}
-reg2=glm(as.numeric(mental_bi)~year+ex2014,data=brfssdata2, family="binomial")
-regression2=tidy(reg2) %>% 
-    mutate(model = "reg2")
-```
-
-```{r}
-dwplot(regression2)
-```
-
-
-```{r}
-reg3=glm(as.numeric(mental_bi)~year+ex2014+sex,data=brfssdata2, family="binomial")
-regression3=tidy(reg3) %>% 
-    mutate(model = "reg3")
-```
-
-```{r}
-dwplot(regression3)
-```
-
-
-
-```{r}
-reg4=glm(as.numeric(mental_bi)~year+ex2014+sex+job,data=brfssdata2, family="binomial")
-
-regression4=tidy(reg4) %>% 
-    mutate(model = "reg4")
-summary(reg4)
-```
-
-
 **Comparing Models**
+
+
 ```{r}
 allmodels=rbind(regression1,regression2,regression3,regression4)
-dwplot(allmodels)
+dwplot(allmodels, vline = geom_vline(xintercept = 0, colour = "grey50", linetype = 2,alpha=0.6)) + 
+  xlab("Coefficient Estimates") + 
+  ylab("") +
+  ggtitle("Estimation of Coefficents for All Models") +
+  theme(axis.text.y = element_text(size=10, angle = 0),
+        axis.text.x = element_text(size=10),
+        plot.title = element_text(size = 12, hjust = 0.5),
+        plot.caption = element_text(hjust = 1, vjust = -1.2),
+        axis.title.y = element_text(size = 11, hjust = 0.5, vjust = 1.75),
+        axis.title.x = element_text(size = 11, hjust = 0.5, vjust = -1.25)+
+
 ```
-
-Another important regression model is the **logistic regression**. In this case, the dependent variable is a binary value.
-
-For this example, I will turn our previous dependent variable into a dichotomous one:
-```{r, eval=FALSE}
-cut=median(safe2$PERSONAL)
-safe2$PERSONAL_bi=ifelse(safe2$PERSONAL>cut,
-                         1,0)
-```
-
-
-Now, let me compute the regression:
-
-```{r, eval=FALSE}
-logit_PERSONAL = glm(PERSONAL_bi~ .,
-                          data = safe2[,-c(1,5)],
-                          family = "binomial")
-summary(logit_PERSONAL)
-```
-
 _____
-<a id='part6'></a>
+<a id='part7'></a>
 
 <p style="text-align: center; font-size: 175%;"><b>
-Findings & Conclusion
+Conclusion of the Analysis
 </b></p>
 
-**Conclusion of the Analysis**
+TEXT HERE
 
 
 

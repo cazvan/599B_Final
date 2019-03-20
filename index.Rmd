@@ -257,7 +257,7 @@ ggplot(dfmelt2,aes(x=year, y = mentavg2)) + #create the lineplot using the new d
   theme(panel.background = element_rect(fill = "white",colour = "grey50"), # add plot theme and background colors
                               plot.caption = element_text(hjust = 0), # default was 1, set caption position
                               plot.title = element_text(hjust = 0.5), # set title position
-                              axis.text.x = element_text(angle = 50, hjust = 1)) + # adjust the x axis labels
+                              axis.text.x = element_text(angle = 90, hjust = 1)) + # adjust the x axis labels
   geom_hline(yintercept = mean(dfmelt2$mentavg2), # add horizontal average line
                            linetype="dashed", # make a dashed line 
                            size=1, # change the line thickness
@@ -290,7 +290,7 @@ ggplot(dfmelt, aes(x=year, y = mentavg, group = ex2014)) + # create the line plo
   theme(panel.background = element_rect(fill = "white",colour = "grey50"), # change the background color
                               plot.caption = element_text(hjust = 0), # default was 1, set caption position
                               plot.title = element_text(hjust = 0.5), # set title position
-                              axis.text.x = element_text(angle = 50, hjust = 1))+ # adjust the x axis labels
+                              axis.text.x = element_text(angle = 90, hjust = 1))+ # adjust the x axis labels
     geom_hline(yintercept = mean(dfmelt2$mentavg2), # add horizontal average line
                            linetype="dashed", # make a dashed line
                            size=1, # change the line thickness 
@@ -326,7 +326,7 @@ ggplot(dfsex, aes(x=year, y = mentavg, group = sex)) + #create a lineplot using 
   theme(panel.background = element_rect(fill = "white",colour = "grey50"), #change background                               color
                               plot.caption = element_text(hjust = 0),# adjust caption position
                               plot.title = element_text(hjust = 0.5), # adjust title position
-                              axis.text.x = element_text(angle = 50, hjust = 1)) + #adjust x                                axis to have an angle
+                              axis.text.x = element_text(angle = 90, hjust = 1)) + #adjust x                                axis to have an angle
   facet_grid(ex2014~.) + #create two graphs according to ex2014
   geom_hline(yintercept = mean(dfmelt2$mentavg2), #dd a horizontal line for the total mean
                            linetype="dashed", #type of line

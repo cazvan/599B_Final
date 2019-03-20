@@ -1,24 +1,44 @@
----
-title: "How Did ACA Expansion Effect the Mental Health of Americans?"
 
-author: "Caz VanDevere, Hanson Shi, & Ana Chkheidze"
-date: "March 20, 2019"  
-output:
-  html_document:
-    df_print: paged
-  pdf_document: default
----
+<style type="text/css">
+
+body, td {
+   font-size: 16px;
+}
+code.r{
+  font-size: 16px;
+}
+pre {
+  font-size: 16px
+}
+</style>
+
+<a id='Top'></a>
+
+<br> 
+<center><img src="http://i.imgur.com/sSaOozN.png" width="500"></center>
+<br>
+
+<p style="text-align: center; font-size: 220%;"><b>
+Income and Right to Work in the United States
+</b></p>
+
+<p style="font-size: 130%;">
+Group</b>: Caz Vandevere, Ana Chkheidze, and Hanson Shi</i>
+</p>
+_____
+<a id='Contents'></a>
+
 <p style="text-align: left; font-size: 175%;"><b>
 Contents:
 </b></p>
 
-1. [Introduction and Data] (#part1)
-2. [Data Pre-Processing] (#part2)
-3. [What is the survey count by year?] (#part3)
-4. [Is there any difference for states that expanded ACA verse those states that did not expand?] (#part4)
-5. [What are the effects of the ACA expansion on males versus females?] (#part5)
-6. [What are the effects of explanatory variables on average mental health?] (#part6)
-7. [Conclusion of the Analysis] (#part7)
+1. [Introduction and Data](#part1)
+2. [Data Pre-Processing](#part2)
+3. [What is the survey count by year?](#part3)
+4. [Is there any difference for states that expanded ACA verse those states that did not expand?](#part4)
+5. [What are the effects of the ACA expansion on males versus females?](#part5)
+6. [What are the effects of explanatory variables on average mental health?](#part6)
+7. [Conclusion of the Analysis](#part7)
 
 _____
 <a id='part1'></a>
@@ -51,7 +71,7 @@ The second dataset was a handmade dataset dataset consisteing of each state in t
 <br>
 **Research Question**
 
-<p style="text-align: left; font-size: 130%;"><b>
+<p style="text-align: left; font-size: 90%;"><b>
 Are there any differences in terms of mental health between the states that expanded ACA and those that did not? If so, what are the effects of the expansion/no expansion on the individuals? (males vs females)
 </b></p>
 
@@ -67,7 +87,6 @@ Data Pre-processing
 </b></p>
 
 First we need call the libraries in order to use the packages
-<<<<<<< HEAD
 
 ```{r,libraries, eval=TRUE, warning=FALSE, error=FALSE, message=FALSE}
 
@@ -208,7 +227,7 @@ What is the survey count by year?
 </b></p>
 
 We start our analysis by looking at the overall number of surveys over the year 2000-2018. This provides more information on the size and depth of our data for conducting analysis.  
-```{r}
+```{r,fig.align='center'}
 #Univariate Visualization: barplot
 source1="BRFSS Survey Data 2000-2018" #source
 titlecount="Survey Count by Year" #title for the plot
@@ -221,13 +240,13 @@ yearplot=ggplot(data= brfssdata, aes(x=year)) + # create the yearplot object usi
   theme(panel.background = element_rect(fill = "white",colour = "grey50"), # choose background colors
                               plot.caption = element_text(hjust = 0), # default was 1 #set caption position 
                               plot.title = element_text(hjust = 0.5), # set title position
-                              axis.text.x = element_text(angle = -30, hjust = 0)) # adjust the x axis labels
+                              axis.text.x = element_text(angle = -50, hjust = 0)) # adjust the x axis labels
 yearplot # display the year plot
 ```
 
 The following line plot shows the overall effect of ACA expansion.  With an average of 3.44 days reported with negative mental health, we've witnessed a significant decrease for negative mental health in year 2002 and year 2014. After the ACA expansion in 2014, there is also a significant increase for negative mental health. 
 
-```{r}
+```{r, fig.align='center'}
 source1="BRFSS Survey Data 2000-2018" #source
 title1="Average Negative Mental Health Days Over Last 30 Days" #title for the plot
 
@@ -238,7 +257,7 @@ ggplot(dfmelt2,aes(x=year, y = mentavg2)) + #create the lineplot using the new d
   theme(panel.background = element_rect(fill = "white",colour = "grey50"), # add plot theme and background colors
                               plot.caption = element_text(hjust = 0), # default was 1, set caption position
                               plot.title = element_text(hjust = 0.5), # set title position
-                              axis.text.x = element_text(angle = 30, hjust = 1)) + # adjust the x axis labels
+                              axis.text.x = element_text(angle = 50, hjust = 1)) + # adjust the x axis labels
   geom_hline(yintercept = mean(dfmelt2$mentavg2), # add horizontal average line
                            linetype="dashed", # make a dashed line 
                            size=1, # change the line thickness
@@ -258,7 +277,7 @@ Is there any difference for states that expanded ACA verse those states that did
 
 The next plot shows that people living in the states that expanded ACA experienced more negative mental health than those living in the states that didn't expand ACA. However, after year 2014, there is a more significant increase for states that did not expand ACA.
 
-```{r}
+```{r, fig.align='center'}
 # Bi-variate Visualization: Line plot
 ## this plot shows the average mental health number reported each year for states that expanded ACA vs. states that didnt expand ACA.
 titlebi="Average Negative Mental Health Days Over Last 30 Days" # source
@@ -271,7 +290,7 @@ ggplot(dfmelt, aes(x=year, y = mentavg, group = ex2014)) + # create the line plo
   theme(panel.background = element_rect(fill = "white",colour = "grey50"), # change the background color
                               plot.caption = element_text(hjust = 0), # default was 1, set caption position
                               plot.title = element_text(hjust = 0.5), # set title position
-                              axis.text.x = element_text(angle = 30, hjust = 1))+ # adjust the x axis labels
+                              axis.text.x = element_text(angle = 50, hjust = 1))+ # adjust the x axis labels
     geom_hline(yintercept = mean(dfmelt2$mentavg2), # add horizontal average line
                            linetype="dashed", # make a dashed line
                            size=1, # change the line thickness 
@@ -280,10 +299,7 @@ ggplot(dfmelt, aes(x=year, y = mentavg, group = ex2014)) + # create the line plo
 annotate("text",x=2017,y=3.455,label="mean",size=3,alpha=0.7)+ # position the mean label
 annotate("text",x=2015.59,y=3.28,label="ACA Expansion",size=3,alpha=0.7)+ # position the ACA Expension label
  scale_color_manual(values = c("steelblue","darkred")) # manually change the line colors
-  #scale_y_continuous(expand = 
-  #facet_grid(ex2014~.) #gender? Income bracket?
 
-#add mean behavior line? Add annotation instead of reference line for 2014?
 ```
 
 _____
@@ -294,7 +310,7 @@ What are the effects of the ACA expansion on males versus females?
 </b></p>
 
 We broke the analysis further down to examine the effects of ACA expansion on male and female respondents. Evidently, ACA expansion had similar effects on both groups in ACA and non-ACA states, i.e. both groups experienced deteriorating mental health from that point onward. Moreover, the analysis shows an interesting result: on average, female respondents experienced more negative mental health days compared to their male counterparts for 18 years. 
-```{r multivar, eval=TRUE}
+```{r multivar, fig.align='center'}
 # Multi-variate Visualization: line plot for sex, income, and education level:
 ## this plot shows the average mental health number reported each year for 
 ## states that expanded ACA vs. states that didnt expand ACA
@@ -310,7 +326,7 @@ ggplot(dfsex, aes(x=year, y = mentavg, group = sex)) + #create a lineplot using 
   theme(panel.background = element_rect(fill = "white",colour = "grey50"), #change background                               color
                               plot.caption = element_text(hjust = 0),# adjust caption position
                               plot.title = element_text(hjust = 0.5), # adjust title position
-                              axis.text.x = element_text(angle = 30, hjust = 1)) + #adjust x                                axis to have an angle
+                              axis.text.x = element_text(angle = 50, hjust = 1)) + #adjust x                                axis to have an angle
   facet_grid(ex2014~.) + #create two graphs according to ex2014
   geom_hline(yintercept = mean(dfmelt2$mentavg2), #dd a horizontal line for the total mean
                            linetype="dashed", #type of line
@@ -321,7 +337,7 @@ ggplot(dfsex, aes(x=year, y = mentavg, group = sex)) + #create a lineplot using 
   annotate("text",x=2012.5,y=2.25,label="ACA Expansion",size=3,alpha=0.7)+ #position text 'ACA   Expansion'
   scale_color_manual(values = c("steelblue","darkred")) #manually add the colors to the lines   for males/females
 ```
-<<<<<<< HEAD
+
 
 <br>
 [Go back to the table of contents](#Contents)
@@ -333,9 +349,10 @@ _____
 What are the effects of explanatory variables on average mental health?
 </b></p>
 
-Explanation
 
 **Regression Analysis-Logit Model**
+
+According to our results, almost all our coefficients are statistically significant with P values extremely close to 0. This raises doubts regarding the fit of our model.
 
 ```{r}
 #starting with a simple model, adding independent variables and tidying along the way
@@ -361,20 +378,20 @@ summary(reg3)
 ```
 
 We assume that the nature of our outcome variable (mental) requires more complex model than a linear regression. We attempted conducting the Zero-Inflated Negative Binomial regression. We attempted a simple analysis. Due to our lack of familiarity with this model, we had to limit our analysis to these few lines. 
-
-```{r}
+```{r,echo=FALSE}
 #library(MASS)
 ```
 
-
-```{r}
+```{r, warning=FALSE}
 zigb <- zeroinfl(mental ~ year + ex2014 + sex, data = brfssdata2)
 summary(zigb)
 ```
 
 **Comparing Models**
 
-```{r}
+The graph below confirms our reservations for the linear model choice. The confidence intervals seem to be too small, hence the dots instead of lines that show the range of estimates. Also, all coefficients but exp2014 seem to be significant wiht P values close to 0. 
+
+```{r, fig.align='center'}
 allmodels=rbind(regression1,regression2,regression3)
 dwplot(allmodels, vline = geom_vline(xintercept = 0, colour = "grey50", linetype = 2,alpha=0.6)) + 
   xlab("Coefficient Estimates") + 
@@ -387,6 +404,17 @@ dwplot(allmodels, vline = geom_vline(xintercept = 0, colour = "grey50", linetype
         axis.title.y = element_text(size = 11, hjust = 0.5, vjust = 1.75),
         axis.title.x = element_text(size = 11, hjust = 0.5, vjust = -1.25))
 ```
+
+_____
+<a id='part7'></a>
+
+<p style="text-align: center; font-size: 175%;"><b>
+Conclusion of the Analysis
+</b></p>
+
+Through our analysis, we found that the overall ACA expansion in 2014 had negative effects on the mental health ie., number of negative mental health days reported increased. We then discovered that after the expansion year there was a more significant increase for states that did not expand ACA. Interestingly, on average, female respondents experienced more negative mental health days compared to their male counterparts for the duration of 18 years.
+
+As for the regression model results, further analysis is needed to determine the right fit for our outcome variable - "mental". 
 
 <br>
 

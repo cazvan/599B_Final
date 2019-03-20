@@ -70,10 +70,7 @@ First we need call the libraries in order to use the packages
 <<<<<<< HEAD
 
 ```{r,libraries, eval=TRUE, warning=FALSE, error=FALSE, message=FALSE}
-=======
-```{r, libraries, eval=TRUE, warning=FALSE, error=FALSE, message=FALSE}
-# call libraries:
->>>>>>> parent of 5752783... Update
+
 library(ggplot2)
 library(haven)
 library(Rmisc)
@@ -86,13 +83,9 @@ library(reshape2)
 library(Hmisc)
 library(dotwhisker)
 library(broom)
-<<<<<<< HEAD
 library(pscl)
-library(MASS)
 library(boot)
 library(cowplot)
-=======
->>>>>>> parent of cb70c6f... Update
 ```
 
 This chunk imports the original data file that was stored in dropbox:
@@ -122,7 +115,6 @@ The chunk below trims unused variables from the dataframe. Because the original 
 This chunk also trims the original datafile into a smaller file, but saves different variables that are used in the multivariate plot:
 
 ```{r loaddata2, eval=FALSE }
-<<<<<<< HEAD
 # brfssdata2=brfssdata_orig%>% # create a second list from the original dataset, with different variables
 #    select(mental, stab, ex2014,sex, year)%>% # select the 5 variables we need for plots
 #    filter(!is.na(stab))%>% # filter out n/a responses
@@ -134,21 +126,7 @@ This chunk also trims the original datafile into a smaller file, but saves diffe
 # write.csv(brfssdata2,"brfss2.csv",row.names = FALSE) # write the list to csv
 # head(brfssdata2) # look at the column names
 # dim(brfssdata2) # look at the dimensions
-# brfssdata2 = read.csv("brfss2.csv") #
-=======
-brfssdata2=brfssdata_orig%>% # create a second list from the original dataset, with different variables
-   select(mental, stab, ex2014,sex, year)%>% # select the 5 variables we need for plots
-   filter(!is.na(stab))%>% # filter out n/a responses
-   filter(!is.na(mental))%>% # filter out n/a responses
-   filter(!is.na(year))%>% # filter out n/a responses
-   filter(!is.na(ex2014))%>% # filter out n/a responses
-   filter(!is.na(sex))%>% # filter out n/a responses
-   filter((year!=2018)) # filter responses from 2018 (it's a tiny sample and has weird averages)
-write.csv(brfssdata2,"brfss2.csv",row.names = FALSE) # write the list to csv
-head(brfssdata2) # look at the column names
-dim(brfssdata2) # look at the dimensions
-brfssdata2 = read.csv("brfss2.csv") #
->>>>>>> parent of de6bd34... Ana-Update
+# brfssdata2 = read.csv("brfss2.csv")
 ```
 
 Then we need to load the data we are going to use for our analysis by importing the datasets we just made (~90mb each). This chunk imports the csv files that the previous two chunks uploaded to Github. Because these files are under 100mb, they were able to be uploaded:
@@ -166,10 +144,12 @@ bad # show us the bad states
 ```
 
 Data prep for visualization: Calculate annual average negative mental days, grouped into expansion and non-expansion states
+
+
 ```{r}
 #pipe=%>% (this is from dplyr) 
 dfmelt=brfssdata%>% #use main dataset
-  select(year, stab, mental, ex2014)%>% #select these 4 variables for use
+  dplyr::select(year, stab, mental, ex2014)%>% #select these 4 variables for use
   filter(stab %nin% bad)%>% # filter out bad states
   filter(!is.na(ex2014))%>% #filter out n/a responses for ex2014 variable
   group_by(year,ex2014)%>% # group responeses by year then ex2014
@@ -340,7 +320,6 @@ ggplot(dfsex, aes(x=year, y = mentavg, group = sex)) + #create a lineplot using 
   annotate("text",x=2017,y=3.55,label="mean",size=3,alpha=0.7)+ #position text 'mean'
   annotate("text",x=2012.5,y=2.25,label="ACA Expansion",size=3,alpha=0.7)+ #position text 'ACA   Expansion'
   scale_color_manual(values = c("steelblue","darkred")) #manually add the colors to the lines   for males/females
-
 ```
 <<<<<<< HEAD
 
@@ -358,9 +337,6 @@ Explanation
 
 **Regression Analysis-Logit Model**
 
-
-=======
->>>>>>> parent of de6bd34... Ana-Update
 ```{r}
 #starting with a simple model, adding independent variables and tidying along the way
 
@@ -376,44 +352,30 @@ regression2=tidy(reg2) %>%
 reg3=lm(as.numeric(mental)~year+ex2014+sex,data=brfssdata2)
 regression3=tidy(reg3) %>% 
     mutate(model = "Model 3")
-#4
-reg4=lm(as.numeric(mental)~year+ex2014+sex+job,data=brfssdata2)
-regression4=tidy(reg4) %>% 
-    mutate(model = "Model 4")
-
-#let's see the results
-summary(reg4)
 ```
-<<<<<<< HEAD
 
-<<<<<<< HEAD
+Let's see the results:
+
+```{r}
+summary(reg3)
+```
 
 We assume that the nature of our outcome variable (mental) requires more complex model than a linear regression. We attempted conducting the Zero-Inflated Negative Binomial regression. We attempted a simple analysis. Due to our lack of familiarity with this model, we had to limit our analysis to these few lines. 
+
+```{r}
+#library(MASS)
+```
+
 
 ```{r}
 zigb <- zeroinfl(mental ~ year + ex2014 + sex, data = brfssdata2)
 summary(zigb)
 ```
 
-=======
->>>>>>> parent of de6bd34... Ana-Update
-```{r}
-zigb1 = tidy(zigb) %>%
-    mutate(model = "zigb1") 
-```
-
-<<<<<<< HEAD
-```{r}
-dwplot(zigb1)
-```
-
 **Comparing Models**
 
-=======
->>>>>>> parent of cb70c6f... Update
-
 ```{r}
-allmodels=rbind(regression1,regression2,regression3,regression4)
+allmodels=rbind(regression1,regression2,regression3)
 dwplot(allmodels, vline = geom_vline(xintercept = 0, colour = "grey50", linetype = 2,alpha=0.6)) + 
   xlab("Coefficient Estimates") + 
   ylab("") +
@@ -423,19 +385,8 @@ dwplot(allmodels, vline = geom_vline(xintercept = 0, colour = "grey50", linetype
         plot.title = element_text(size = 12, hjust = 0.5),
         plot.caption = element_text(hjust = 1, vjust = -1.2),
         axis.title.y = element_text(size = 11, hjust = 0.5, vjust = 1.75),
-        axis.title.x = element_text(size = 11, hjust = 0.5, vjust = -1.25)+
-
+        axis.title.x = element_text(size = 11, hjust = 0.5, vjust = -1.25))
 ```
-_____
-<a id='part7'></a>
-
-<p style="text-align: center; font-size: 175%;"><b>
-Conclusion of the Analysis
-</b></p>
-
-TEXT HERE
-
-
 
 <br>
 
@@ -444,6 +395,4 @@ TEXT HERE
 [Go back to the table of contents](#Contents)
 
 [Go to the Project Repo](https://github.com/cazvan/599B_Final)
-=======
->>>>>>> parent of de6bd34... Ana-Update
 

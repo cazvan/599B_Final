@@ -19,7 +19,8 @@ pre {
 <br>
 
 <p style="text-align: center; font-size: 220%;"><b>
-Income and Right to Work in the United States
+Sex Disparity in Mental Health Outcomes 
+    (With or Without ACA Expansion)
 </b></p>
 
 <p style="font-size: 130%;">
@@ -350,7 +351,7 @@ What are the effects of explanatory variables on average mental health?
 </b></p>
 
 
-**Regression Analysis-Logit Model**
+**Regression Analysis-Linear Model**
 
 According to our results, almost all our coefficients are statistically significant with P values extremely close to 0. This raises doubts regarding the fit of our model.
 

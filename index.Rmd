@@ -19,8 +19,7 @@ pre {
 <br>
 
 <p style="text-align: center; font-size: 220%;"><b>
-Sex Disparity in Mental Health Outcomes 
-    (With or Without ACA Expansion)
+Sex Disparity in Mental Health Outcomes\n(With or Without ACA Expansion)
 </b></p>
 
 <p style="font-size: 130%;">
@@ -298,7 +297,7 @@ ggplot(dfmelt, aes(x=year, y = mentavg, group = ex2014)) + # create the line plo
                            alpha=0.5)+ # change line depth
   theme(legend.title = element_blank())+ # get rid of the legend title
 annotate("text",x=2017,y=3.455,label="mean",size=3,alpha=0.7)+ # position the mean label
-annotate("text",x=2015.59,y=3.28,label="ACA Expansion",size=3,alpha=0.7)+ # position the ACA Expension label
+annotate("text",x=2015.85,y=3.25,label="ACA Expansion",size=3,alpha=0.7)+ # position the ACA Expension label
  scale_color_manual(values = c("steelblue","darkred")) # manually change the line colors
 
 ```
@@ -335,7 +334,7 @@ ggplot(dfsex, aes(x=year, y = mentavg, group = sex)) + #create a lineplot using 
                            alpha=0.5)+ #transparency
   theme(legend.title = element_blank())+ #get rid of the legend title
   annotate("text",x=2017,y=3.55,label="mean",size=3,alpha=0.7)+ #position text 'mean'
-  annotate("text",x=2012.5,y=2.25,label="ACA Expansion",size=3,alpha=0.7)+ #position text 'ACA   Expansion'
+  annotate("text",x=2012.35,y=2.25,label="ACA Expansion",size=3,alpha=0.7)+ #position text 'ACA   Expansion'
   scale_color_manual(values = c("steelblue","darkred")) #manually add the colors to the lines   for males/females
 ```
 
